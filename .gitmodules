@@ -1,0 +1,3 @@
+[submodule "labs/lab1"]
+	path = labs/lab1
+	url = git@github.com:briancpark/cs152-lab1.git
