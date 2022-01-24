@@ -1,0 +1,92 @@
+\documentclass[11pt]{article}
+\usepackage{cs152}
+
+%%%%%%%%%%%%%%%%%%%% name/id
+\rfoot{\small Brian Park | 3033045069}
+
+
+%%%%%%%%%%%%%%%%%%%% Course/HW info
+\newcommand*{\instr}{John Wawrzynek}
+\newcommand*{\term}{Spring 2022}
+\newcommand*{\coursenum}{CS 152}
+\newcommand*{\coursename}{Computer Architecture and Engineering}
+\newcommand*{\hwnum}{1}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Document Start %%%%%%%%%%%%%%%%%
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Question 3.4
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{(Directed) Problem 3.4}
+
+\centerline{\includegraphics[width=7in]{../labs/lab1/figures/3_4.png}}
+
+The benchmark that has the highest arithmetic intensity is multiply, which makes sense as a lot of arithmetic operations would be happening. The benchmark that seems to be the most memory bound is the Hanoi towers benchmark. This makes sense if the algorithm used is the recursive algorithm, causing a lot of stack frame allocation. Benchmark that seems dependent on branch prediction performance is median. This makes sense as you would have a lot of control statements dependent on sorting. The quicksort benchmark also shows similar intensities per instruction due to this.
+
+\section*{(Directed) Problem 3.5}
+
+\centerline{\includegraphics[width=7in]{../labs/lab1/figures/3_5_1.png}}
+
+The overall CPI of the machine for each benchmark is as follows:
+
+\begin{table}[ht]
+\caption{New CPI for Benchmarks} % title of Table
+\centering % used for centering table
+\begin{tabular}{c c} % centered columns (4 columns)
+\hline\hline %inserts double horizontal lines
+Benchmark & CPI\#1 \\ [0.5ex] % inserts table
+%heading
+\hline % inserts single horizontal line
+dhrystone & 1.475 \\
+median & 1.501 \\
+multiply & 1.209 \\
+qsort & 1.465 \\
+rsort & 1.376 \\
+towers & 1.502 \\
+vvadd & 1.423 \\
+[1ex] % [1ex] adds vertical space
+\hline %inserts single line
+\end{tabular}
+\label{table:nonlin} % is used to refer this table in the text
+\end{table}
+
+\centerline{\includegraphics[width=7in]{../labs/lab1/figures/3_5_2.png}}
+
+For the case that loads and stores are sped up to have an average CPI of 1, then the new CPIs are as follows:
+\begin{table}[ht]
+\caption{New CPI for Benchmarks} % title of Table
+\centering % used for centering table
+\begin{tabular}{c c} % centered columns (4 columns)
+\hline\hline %inserts double horizontal lines
+Benchmark & CPI\#1 \\ [0.5ex] % inserts table
+%heading
+\hline % inserts single horizontal line
+dhrystone & 1.121 \\
+median & 1.18 \\
+multiply & 1.16 \\
+qsort & 1.151 \\
+rsort & 1.028 \\
+towers & 1.08 \\
+vvadd & 1.118 \\
+[1ex] % [1ex] adds vertical space
+\hline %inserts single line
+\end{tabular}
+\label{table:nonlin} % is used to refer this table in the text
+\end{table}
+
+\centerline{\includegraphics[width=7in]{../labs/lab1/figures/3_5_3.png}}
+
+The plot above shows the comparison of CPIs between the originally given problem prompt and the one optimized with loads and stores. We see that this is an improvements for benchmarks like dhrystone, rsort, and towers. Unfortunately, there is not much of an improvement else where. For just a small speedup, it's not that worthwhile for all the benchmarks. Because there is not one dominating category of instructions for each of the benchmark, the modifications get diluted down in terms of total CPI.
+
+\section*{(Directed) Problem 3.6}
+\section*{(Directed) Problem 3.7}
+
+\section*{(Open-ended) Problem 4.1}
+\section*{(Open-ended) Problem 4.2}
+\section*{(Open-ended) Problem 4.3}
+\section*{(Open-ended) Problem 4.4}
+\section*{(Directed) Problem 5}
+
+
+\end{document}
