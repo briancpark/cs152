@@ -24,6 +24,23 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \Question{CISC, RISC, Accumulator, and Stack: Comparing ISAs}
 
+\lstset{language=c}
+\begin{lstlisting}
+unsigned int rotate(unsigned int x, unsigned int n) {
+    unsigned int msb;
+
+    while (n != 0) {
+        msb = x >> 31;
+        x = (x << 1) | msb;
+        n--;
+    }
+    return x;
+}
+\end{lstlisting}
+
+\begin{Parts}
+	\Part \textbf{CISC} \\
+     In total there are 15 bytes in the program. There needs to be 79 bytes of instructions needed to be fetched. We have to be aware that the loop condition is fetched $n + 1$ iterations, so the total number bytes fetched is $(6 * 4) + (5 * 11) = 79$ by accounting the number of iterations in the loop condition and loop body. In the program, there is no memory stored or loaded, at least in the program given. Thus 0 bytes of data loaded or stored. \\
 \lstset{language=[RISC-V]{Assembler}}
 \begin{lstlisting}
 loop:  test %ecx,%ecx 
@@ -36,10 +53,8 @@ loop:  test %ecx,%ecx
        jmp loop 
 done:  ...
 \end{lstlisting}
-
-\begin{Parts}
-	\Part In total there are 15 bytes in the program. There needs to be 79 bytes of instructions needed to be fetched. We have to be aware that the loop condition is fetched $n + 1$ iterations, so the total number bytes fetched is $(6 * 4) + (5 * 11) = 79$ by accounting the number of iterations in the loop condition and loop body. In the program, there is no memory stored or loaded, at least in the program given. Thus 0 bytes of data loaded or stored.
-	\Part Here lies the translation from x86 to RISC-V assembly:
+	\Part \textbf{RISC} \\
+    Here lies the translation from x86 to RISC-V assembly \\
 \lstset{language=[RISC-V]{Assembler}}
 \begin{lstlisting}
 loop:  beq a0, x0, done
@@ -53,8 +68,8 @@ done:  ...
 \end{lstlisting}
 	The instruction set between 32 bit and 64 bit ISA should remain the same bit width, so all we would need to do is multiply how many instructions are in the converted assembly code by 4 bytes. Thus, there is 1 instruction for the branch condition and 6 instruction for the loop body. $(6 * 4) + (5 * 24) = 144$ bytes of instructions fetched. Again, there is no loading or storing, so 0 bytes of memory is accessed/transferred. 
 	
-	\Part Here lies the translation from x86 to stack assembly:
-	
+	\Part \textbf{Stack} \\
+    Here lies the translation from x86 to stack assembly: \\
 \lstset{language=[RISC-V]{Assembler}}
 \begin{lstlisting}
        pop 0x8000
@@ -74,20 +89,57 @@ done:  ...
 
 Push, pop, and branch instructions are the most expensive and take 3 bytes. Other instructions are 1 byte. The program itself has $(7 * 3) + (4 * 1) = 25$ bytes. The number of bytes that needs to be fetched is 119 bytes. The number of bytes loaded depends on the number of pushes, so there are $(4 * 6) + (4 * 3 * 5) = 84$ bytes loaded from memory. The number of bytes stored depends on the number of pops, so there are  $4 + (4 * 5) = 24$ bytes stored to memory.
 
-\end{Parts}
+Interestingly enough, for the stack machine, since we are limited to only two registers, there is register spilling over to memory. I've desined the code in such a way that does not use more than two stack registers at a time, so the number of bytes loaded and stored will actually remain the same if it was expanded to 8. But if my program did use more stack registers than it has allocated, the number of bytes stored and loaded would decrease.
+    \Part \textbf{Accumulator} \\
+    Here lies the translation from x86 to accumulator assembly: \\
+    \lstset{language=[RISC-V]{Assembler}}
+    \begin{lstlisting}
+    loop:  load 0x8004
+           beqz done
+           dec
+           store 0x8004
+           load 0x8000
+           shl
+           swap
+           load 0x8000
+           sign
+           store 0x8000
+           swap
+           or 0x8000
+    done:  load 0x8000
+    \end{lstlisting}
 
+There are 29 bytes of instructions in the program. The number of bytes that needs to be fetched is $(6 * 6) + (5 * 20) + 3 = 139$ bytes. The number of bytes loaded is $(6 * 3) + (6 * 5) = 48$ bytes. The number of bytes stored is $(6 * 3) + (6 * 6) = 56$ bytes.
+
+    \Part \textbf{Conclusions} \\
+    We notice that RISC-V has to fetch a lot of instructions, and they are relatively low for CISC, stack, and accumulator ISAs. We also notice that stack and accumulator ISAs using memory for a simple program, while CISC and RISC maintiain their data in registers. Also, the stack and accumulator ISAs spill registers when too much data is being moved around which is why the number of bytes loaded and stored is larger. When choosing an ISA, I would choose RISC as the instruction set is very simple and not much data is being moved around, causing me the programmer to develop more easily. There was extra thought involved for stack and accumulator as I needed to figure out how to handle memory.
+
+    \Part \textbf{Optimization} \\
+\lstset{language=[RISC-V]{Assembler}}
+    \begin{lstlisting}
+    loop:  beq a0, x0, done
+           mov t0, a1
+           srli t0, t0, 31
+           slli a1, a1, 1
+           or a1, t0, a1
+           addi a0, a0, -1
+           j loop
+    done:  ...
+    \end{lstlisting}
+\end{Parts}
 
 \newpage
 \Question{CISC vs RISC}
 \begin{Parts}
-	\Part Assume that compiler technology is poor, and therefore your users are far more apt to write all of their code in assembly. A \textbf{RISC} ISA would be best appreciated by these programmers. \\ \\
+	\Part
+    Assume that compiler technology is poor, and therefore your users are far more apt to write all of their code in assembly. A \textbf{RISC} ISA would be best appreciated by these programmers. \\ \\
 	Although CISC provides a more complex ISA, RISC may be more suitable towards the programmer. For example, RISC-V has 47 instructions. It may take more instructions to write a program compared to CISC, but at least it's better than trying to search what the correct instruction to use is in the thousands of instructions that CISC, such as x86 provides.
 	\Part You desire to make compilers better at targeting your \textit{yet-to-be-designed} machine. Therefore, you choose a \textbf{RISC} ISA, as it would be easiest for a compiler to target, thus allowing your users to write code in higher-level languages like C and Fortran and raise their productivity. \\ \\
 	Because a CISC ISA may have a lot of microcoded subroutines and microinstructions, there maybe complicated conversion to a co
 	\Part Assume that CPU logic is fast, very fast, while instruction fetch accesses are at least 10x slower (suppose you are the lead architect of the “709”). Which ISA style do you choose as a best match for the hardware’s limitations? \\ \\
-	\textbf{CISC}
-	\Part Starting with a clean slate in the year 2021 (area/logic/memory is cheap), you think that a \textbf{RISC} ISA that would lend itself best to a very high performance processor (e.g., high frequency, highly pipelined).
-
+	\textbf{CISC}. As RISC ISAs tend to have fewer instructions to work with, the tradeoff is that it has to fetch more instructions. For a CISC architecture, the number of instructions may be lower since the instructions themselves are microcoded and complex, thus letting faster logic push the processor to it's limitation and full utilization.
+	\Part Starting with a clean slate in the year 2021 (area/logic/memory is cheap), you think that a \textbf{RISC} ISA that would lend itself best to a very high performance processor (e.g., high frequency, highly pipelined). \\ \\
+    A RISC ISA definitely can benefit from pipelining and high frequency over a CISC processor. A CISC processor might be hard to fully pipeline due to microcoded instructions and complex instructions. The design of RISC ISAs are meant to be pipelined, so it can be utilized to the fullest for a very high performance processor that is high frequency and highly pipelined. 
 	
 \end{Parts}
 
