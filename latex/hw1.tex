@@ -115,6 +115,7 @@ There are 29 bytes of instructions in the program. The number of bytes that need
     We notice that RISC-V has to fetch a lot of instructions, and they are relatively low for CISC, stack, and accumulator ISAs. We also notice that stack and accumulator ISAs using memory for a simple program, while CISC and RISC maintiain their data in registers. Also, the stack and accumulator ISAs spill registers when too much data is being moved around which is why the number of bytes loaded and stored is larger. When choosing an ISA, I would choose RISC as the instruction set is very simple and not much data is being moved around, causing me the programmer to develop more easily. There was extra thought involved for stack and accumulator as I needed to figure out how to handle memory.
 
     \Part \textbf{Optimization} \\
+    A way to optimize the code is to exploit instruction level parallelism and unroll the loop. This is what most modern compilers do automatically, but in RISC-V assembly, it would look like the following: \\
 \lstset{language=[RISC-V]{Assembler}}
     \begin{lstlisting}
     loop:  beq a0, x0, done
@@ -126,6 +127,24 @@ There are 29 bytes of instructions in the program. The number of bytes that need
            j loop
     done:  ...
     \end{lstlisting}
+\end{Parts}
+\newpage
+
+\Question{Microprogramming and Bus-based Architectures}
+\begin{Parts}
+    \Part \textbf{Implementing SUBLEQ}
+    \Part \textbf{Implementing Character Count}
+    \Part \textbf{Instruction Execution Times}
+\end{Parts}
+\newpage
+
+\Question{6-Stage Pipeline}
+\begin{Parts}
+    \Part \textbf{Hazards: Second Write Port}
+    \Part \textbf{Hazards: Bypasses Removed and New Hazards}
+    \Part \textbf{Precise Exceptions}
+    \Part \textbf{Precise Exceptions: Implemented using a Interlock}
+    \Part \textbf{Precise Exceptions: Implemented using an Extra Read Port}
 \end{Parts}
 
 \newpage
@@ -140,10 +159,10 @@ There are 29 bytes of instructions in the program. The number of bytes that need
 	\textbf{CISC}. As RISC ISAs tend to have fewer instructions to work with, the tradeoff is that it has to fetch more instructions. For a CISC architecture, the number of instructions may be lower since the instructions themselves are microcoded and complex, thus letting faster logic push the processor to it's limitation and full utilization.
 	\Part Starting with a clean slate in the year 2021 (area/logic/memory is cheap), you think that a \textbf{RISC} ISA that would lend itself best to a very high performance processor (e.g., high frequency, highly pipelined). \\ \\
     A RISC ISA definitely can benefit from pipelining and high frequency over a CISC processor. A CISC processor might be hard to fully pipeline due to microcoded instructions and complex instructions. The design of RISC ISAs are meant to be pipelined, so it can be utilized to the fullest for a very high performance processor that is high frequency and highly pipelined. 
-	
 \end{Parts}
+\newpage
 
-
+\Question{Iron Law of Processor Performance}
 
 
 \end{document};
