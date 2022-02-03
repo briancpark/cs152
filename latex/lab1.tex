@@ -24,6 +24,8 @@
 
 The benchmark that has the highest arithmetic intensity is multiply, which makes sense as a lot of arithmetic operations would be happening. The benchmark that seems to be the most memory bound is the Hanoi towers benchmark. This makes sense if the algorithm used is the recursive algorithm, causing a lot of stack frame allocation. Benchmark that seems dependent on branch prediction performance is median. This makes sense as you would have a lot of control statements dependent on sorting. The quicksort benchmark also shows similar intensities per instruction due to this.
 
+\newpage
+
 \section*{(Directed) Problem 3.5}
 
 \centerline{\includegraphics[width=7in]{../labs/lab1/figures/3_5_1.png}}
@@ -79,8 +81,45 @@ vvadd & 1.118 \\
 
 The plot above shows the comparison of CPIs between the originally given problem prompt and the one optimized with loads and stores. We see that this is an improvements for benchmarks like dhrystone, rsort, and towers. Unfortunately, there is not much of an improvement else where. For just a small speedup, it's not that worthwhile for all the benchmarks. Because there is not one dominating category of instructions for each of the benchmark, the modifications get diluted down in terms of total CPI.
 
+\newpage
+
 \section*{(Directed) Problem 3.6}
+
+\centerline{\includegraphics[width=7in]{../labs/lab1/figures/3_6.png}}
+
+According to figure, disabling bypassing increases the CPI in all benchmarks. Quantitatively that 
+
+\begin{table}[ht]
+\caption{New CPI for Benchmarks} % title of Table
+\centering % used for centering table
+\begin{tabular}{c c} % centered columns (4 columns)
+\hline\hline %inserts double horizontal lines
+Benchmark & CPI\#1 \\ [0.5ex] % inserts table
+%heading
+\hline % inserts single horizontal line
+dhrystone & 0.666 \\
+median & 0.778 \\
+multiply & 0.819 \\
+qsort & 0.734 \\
+rsort & 0.466 \\
+towers & 0.747 \\
+vvadd & 0.735 \\
+[1ex] % [1ex] adds vertical space
+\hline %inserts single line
+\end{tabular}
+\label{table:nonlin} % is used to refer this table in the text
+\end{table}
+
+We see that full bypassing performs better than full interlocking. If adding full bypassing would hurt the cycle time of the processor by 25\%, then the cycle time will most likely not be hurt or remain the same compared to full interlocking. 
+
+
+\newpage
 \section*{(Directed) Problem 3.7}
+
+
+
+\newpage
+
 
 \section*{(Open-ended) Problem 4.1}
 \section*{(Open-ended) Problem 4.2}

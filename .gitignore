@@ -1,1 +1,8 @@
 .DS_Store
+
+# LaTeX files
+*.aux
+*.log
+*.pdf
+*.synctex.gz
+*.out
