@@ -11,6 +11,7 @@
 \newcommand*{\coursenum}{CS 152}
 \newcommand*{\coursename}{Computer Architecture and Engineering}
 \newcommand*{\hwnum}{1}
+\usepackage{pdfpages}
 
 \rhead{\LARGE   \fontfamily{lmdh}\selectfont	HW \hwnum}
 
@@ -20,7 +21,7 @@
 \begin{document}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Question 3.4
+% Question 1
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \Question{CISC, RISC, Accumulator, and Stack: Comparing ISAs}
 
@@ -58,7 +59,7 @@ done:  ...
 \lstset{language=[RISC-V]{Assembler}}
 \begin{lstlisting}
 loop:  beq a0, x0, done
-       mov t0, a1
+       mv t0, a1
        srli t0, t0, 31
        slli a1, a1, 1
        or a1, t0, a1
@@ -118,36 +119,105 @@ There are 29 bytes of instructions in the program. The number of bytes that need
     A way to optimize the code is to exploit instruction level parallelism and unroll the loop. This is what most modern compilers do automatically, but in RISC-V assembly, it would look like the following: \\
 \lstset{language=[RISC-V]{Assembler}}
     \begin{lstlisting}
-    loop:  beq a0, x0, done
-           mov t0, a1
+           li s0, 4
+    loop:  blt a0, s0, tail # Unroll the loop 4 times
+    	   mv t0, a1
+	       srli t0, t0, 31
+	       slli a1, a1, 1
+	       or a1, t0, -1
+	       mov t0, a1
+	       srli t0, t0, 31
+	       slli a1, a1, 1
+	       or a1, t0, -1
+	       mv t0, a1
+	       srli t0, t0, 31
+	       slli a1, a1, 1
+	       or a1, t0, -1
+	       mv t0, a1
+	       srli t0, t0, 31
+	       slli a1, a1, 1
+	       or a1, t0, -1
+	       addi a0, a0, -4
+    tail:  beq a0, x0, done # Tail Case
+           mv t0, a1 
            srli t0, t0, 31
            slli a1, a1, 1
            or a1, t0, a1
            addi a0, a0, -1
-           j loop
+           j tail
     done:  ...
     \end{lstlisting}
-\end{Parts}
+    In total, there are 104 bytes of instructions fetched. Compared to the original code, 144 bytes, there are 40 bytes less instruction fetched, due to the fewer branches.
+    \end{Parts}
 \newpage
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Question 2
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \Question{Microprogramming and Bus-based Architectures}
 \begin{Parts}
-    \Part \textbf{Implementing SUBLEQ}
-    \Part \textbf{Implementing Character Count}
-    \Part \textbf{Instruction Execution Times}
+    \Part \textbf{Implementing SUBLEQ} \\
+    Answer to this question is located at the end of this homework.
+    \Part \textbf{Implementing Character Count} \\
+    Answer to this question is also located at the end of this homework.
+    \Part \textbf{Instruction Execution Times} \\
+    \lstset{language=[RISC-V]{Assembler}}
+    \begin{lstlisting}
+    	SUB x3,x2,x1                # 6 cycles
+		ANDI x2,x1,#4               # 6 cycles
+		LW x1,0(x2)                 # 8 cycles
+		BNE x1,x2,label #(x1 == x2) # 7 cycles
+		BNE x1,x2,label #(x1 != x2) # 10 cycles
+		BEQ x1,x2,label #(x1 != x2) # 10 cycles
+		BEQ x1,x2,label #(x1 == x2) # 7 cycles
+		J label                     # 9 cycles
+		JAL label                   # 9 cycles
+		JALR x1                     # 9 cycles
+		AUIPC x1, #128              # 7 cycles
+    \end{lstlisting}
 \end{Parts}
+The instruction that takes the most to execute is the branch instructions as you have to account for the extra cycles it takes to compare and jump. The fewest cycles are the one that are arithmetic. 
 \newpage
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Question 3
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \Question{6-Stage Pipeline}
 \begin{Parts}
-    \Part \textbf{Hazards: Second Write Port}
-    \Part \textbf{Hazards: Bypasses Removed and New Hazards}
-    \Part \textbf{Precise Exceptions}
-    \Part \textbf{Precise Exceptions: Implemented using a Interlock}
-    \Part \textbf{Precise Exceptions: Implemented using an Extra Read Port}
+    \Part \textbf{Hazards: Second Write Port} \\
+    	The second write port allows arithmetic operations to write back faster by detecting RAW hazards earlier and avoiding them as well. The is enough gap between instructions where a RAW like the following RISC-V assembly would not be a problem with the second write port.
+	\lstset{language=[RISC-V]{Assembler}}
+    \begin{lstlisting}
+    add x1, x1, x1
+    add x2, x2, x2
+    add x3, x1, x3
+    \end{lstlisting}
+    \Part \textbf{Hazards: Bypasses Removed and New Hazards} \\
+    	ALU results don't have to be bypassed from end of M2 and writeback stage. The bypasses from the end of M1 to end of Instruction Decode can also be removed, as well as the end of M1 to the end of Instruction Fetch. Because of the earlier writeback, there is a new WAW hazard when you handle non ALU writebacks, which happen later in the pipeline. The writeback needs to be scheduled or stalled in order to let two concurrent writebacks from the ALU and writeback mux not have a data race.
+    \Part \textbf{Precise Exceptions} \\
+		We know that the datapath detects a misaligned address in the beginning of M2. Since a write back from ALU happens much earlier, we might not be able to detect an exception synchronously. Below, we notice that an incorrect 
+	\verb|lw| happens, but the \verb|addi| instruction will execute before catching the exception. 
+	\lstset{language=[RISC-V]{Assembler}}
+    \begin{lstlisting}
+	lw x1, -3(x1)
+	addi x2, x0, 0xBEEF
+    \end{lstlisting}
+    \Part \textbf{Precise Exceptions: Implemented using a Interlock} \\
+		Precise exception can be implemented by adding a new interlock that will stall an instruction. Particularly in our 6-stage pipeline, we stall any instruction that uses the ALU in the ID stage, but uses an instruction pipelined in the EX stage that is a memory operation. This is so that we let the memory operation finish first in the pipeline, then let the ALU operation finish due to the earlier writeback. Thus, the snipped below, which is the same as before, is a good example:
+	\lstset{language=[RISC-V]{Assembler}}
+    \begin{lstlisting}
+	lw x1, -3(x1)
+	addi x2, x0, 0xBEEF
+    \end{lstlisting}
+    \Part \textbf{Precise Exceptions: Implemented using an Extra Read Port} \\
+    	We can implement precise exceptions by levering the extra read port to bubble or forward the older value of a register to be updated to a pipelined register. This is so we avoid WAW hazards with a ALU operations happening right after a load or store. This effectively removes the need for interlocking as there are no data hazards as we explored with previous questions. 
 \end{Parts}
 
 \newpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Question 4
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \Question{CISC vs RISC}
 \begin{Parts}
 	\Part
@@ -162,7 +232,81 @@ There are 29 bytes of instructions in the program. The number of bytes that need
 \end{Parts}
 \newpage
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Question 5
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \Question{Iron Law of Processor Performance}
 
+\begin{Parts}
+	\Part \textbf{Adding a branch delay slot}
+		\begin{enumerate}[i]
+			\item \textbf{Instructions / Program} \\
+				Increase, NOPs fill in the missing delay.
+			\item \textbf{Cycles / Instruction} \\
+				Decrease, control hazards are eliminated since NOPs are executed. This is especially true in a RISC ISA.
+			\item \textbf{Seconds / Cycles} \\
+				No effect, should remain the same as there is nothing else going on.
+			\item \textbf{Overall Performance} \\
+				Ambiguous, this is subjective to what kinds of program the CPU is going to run. If it has a lot of branch instructions, then it will be beneficial if it can fill in the delay slots with other instructions.
+		\end{enumerate}
+	\Part \textbf{Adding a complex instruction}
+		\begin{enumerate}[i]
+			\item \textbf{Instructions / Program} \\
+				Decrease, as a CISC instruction could potentially replace a bunch of RISC instructions in a single microcoded subroutine.
+			\item \textbf{Cycles / Instruction} \\
+				Increase, there are now more cycles to execute a complex instruction, such as a separate stage for a microcoded instruction/subroutine.
+			\item \textbf{Seconds / Cycles} \\
+				Increase, more control logic will increase the critical path and the time it takes to complete a cycle.
+			\item \textbf{Overall Performance} \\
+				Ambiguous, as it's often dependent how well the programmer can utilize the instruction. For CISC, compilation may be easier to optimize, while it's the opposite for RISC.
+		\end{enumerate}
+	\Part \textbf{Reduce number of registers in the ISA}
+		\begin{enumerate}[i]
+			\item \textbf{Instructions / Program} \\
+				Increase, there will be more loads/stores since the registers need to spill into memory.
+			\item \textbf{Cycles / Instruction} \\
+				Increase, since there are more loads and stores, this could also lead to more stalls when fetching from memory.
+			\item \textbf{Seconds / Cycles} \\
+				No effect, given that all registers perform the same.
+			\item \textbf{Overall Performance} \\
+				Ambiguous, there is a tradeoff. Depending on the program, RISC-V could not utilize all it's registers.
+		\end{enumerate}
+	\Part \textbf{Improving memory access speed}
+		\begin{enumerate}[i]
+			\item \textbf{Instructions / Program} \\
+				No effect, instructions don't care about how fast memory is.
+			\item \textbf{Cycles / Instruction} \\
+				Decrease, there could be less stalls, thus less cycles per instruction.
+			\item \textbf{Seconds / Cycles} \\
+				Decrease, memory access speed is improved, thus less seconds it takes per cycle for memory fetch.
+			\item \textbf{Overall Performance} \\
+				Improve, memory is the main bottleneck on the CPU, and there has historically been a gap between memory and CPU performance. Improving memory latency to match up with the transistors and logic gates of the CPU will help performance.
+		\end{enumerate}
+	\Part \textbf{Adding 16-bit versions of the most common instructions in RISC-V (normally 32 bits in length) to the ISA (i.e., make RISC-V a variable-length ISA)}
+		\begin{enumerate}[i]
+			\item \textbf{Instructions / Program} \\
+				No effect, the number of instructions stay the same.
+			\item \textbf{Cycles / Instruction} \\
+				Decrease, there will smaller instructions to fetch, and cycles can decrease since memory latency can be improved. This is if all the instructions fetched fit in the instruction cache.
+			\item \textbf{Seconds / Cycles} \\
+				Increase, instruction decode may become more complicated. Also, since these instructions could be packed tightly with variable length instruction length, there may be extra time to account for instruction memory alignment. 
+			\item \textbf{Overall Performance} \\
+				No effect, the tradeoff between less cycles per instruction and more seconds per cycle cancel each other out. 
+		\end{enumerate}
+	\Part \textbf{For a given CISC ISA, changing the implementation of the micro-architecture from a microcoded engine to a RISC pipeline (with a CISC-to-RISC decoder on the frontend)}
+		\begin{enumerate}[i]
+			\item \textbf{Instructions / Program} \\
+				No effect, the instructions are still fed the same way from software, it's only the hardware being changed.
+			\item \textbf{Cycles / Instruction} \\
+				Decrease, microcode takes more cycles to execute per instruction, but since it's running on a RISC pipeline it'll decrease it to 1 cycles per instruction. 
+			\item \textbf{Seconds / Cycles} \\
+				No effect, assuming that microcode cycles and RISC cycles in the pipeline are the same. 
+			\item \textbf{Overall Performance} \\
+				Improve, the decrease of CPI from CISC to RISC is a drastic improvement for CPI.
+		\end{enumerate}
+\end{Parts}
 
-\end{document};
+
+\includepdf[pages=-]{1_2_1.pdf}
+\includepdf[pages=-]{1_2_2.pdf}
+\end{document}
