@@ -115,17 +115,31 @@ We see that full bypassing performs better than full interlocking. If adding ful
 
 \newpage
 \section*{(Directed) Problem 3.7}
+The percentages that the load and store instructions make are displayed below. Interestingly, arithmetic operations are blow up proportionally depending on the number of non-zero offsets for load and stores. For all benchmarks, arithmetic instructions dominate the proportion.
 
+\centerline{\includegraphics[width=7in]{../labs/lab1/figures/3_7_1.png}}
 
+We see that although there is a percentage increase of arithmetic instructions, when we look at how many instructions are executed in total is only a small percentage of increase due to the extra arithmetic instruction for fixing the offset before passing the register for memory access.
+
+\centerline{\includegraphics[width=7in]{../labs/lab1/figures/3_7_2.png}}
+
+I would advise my employer to adopt this new strategy. The percentage of instruction increase ranges from 1.0214\% to 1.1673\% across all benchmarks. Considering the new design saves on energy and doesn't clog the instruction pipeline due to no need to compute offsets
+between the Execute/ Address Calculation and Memory Access stage. Thus, the small percentage increase of instruction, and more utilization of the ALU are not that costly and are good tradeoffs. 
 
 \newpage
 
-
 \section*{(Open-ended) Problem 4.1}
-\section*{(Open-ended) Problem 4.2}
-\section*{(Open-ended) Problem 4.3}
-\section*{(Open-ended) Problem 4.4}
+
+
+\newpage
 \section*{(Directed) Problem 5}
+The directed portion took around 6 hours. Mostly, it was getting setup and running scripts, which was done asynchronously for me while doing other stuff. \\
+The open ended portion took 3 hours. It was a challenge to develop a program that executes a lot of branch instructions while thinking about how the compiler would generate assembly code. \\
+This lab was fun, but I wish there were more coding to do. The directed portion felt like a data analysis section, but it was actually fun analyzing the different benchmarks. The open ended was by far the most fun, because you get exposed to the whole stack from high level C code to low level assembly. \\
+I learnt that there are many ways evaluating CPU performance as well as observing tradeoff between certain design decisions. \\
+There's nothing in this lab that needs to be changed, I think it was a good first lab. \\
+Contribution was done individually for each part. Then we shared work evenly for open ended, each trying different approaches.
+
 
 
 \end{document}
