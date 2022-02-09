@@ -184,13 +184,17 @@ Misc. & 0.006 \\
 \label{table:nonlin} % is used to refer this table in the text
 \end{table}
 
-To achieve this high percentage of branch instructions, we had to overcome the optimizations that the compiler imposed, even with \verb|-O0| C flag set, making this percentage difficult to achieve. Trying to lower down the number of arithmetic instructions was hard, as we wanted to utilize for loops to increase the branching instructions. We also had to modify the \verb|tracer.py| framework to separate the distinction between branches and jumps.
+To achieve this high percentage of branch instructions, we had to overcome the optimizations that the compiler imposed, even with \verb|-O0| C flag set, making this percentage difficult to achieve. Trying to lower down the number of arithmetic instructions was challenging, as we wanted to utilize for loops to increase the branching instructions. We also had to modify the \verb|tracer.py| framework to separate the distinction between branches and jumps.
 
-First, I noticed that the Ld/St percentage was really high when dealing with for loops. In office hours, I learned that you can use the \verb|register| keyword to map a variable to a register rather than loading from memory. This drastically brought down the overhead of Ld/St used by \verb|lw| and used \verb|li| instead. 
+First, I noticed that the Ld/St percentage was really high when dealing with for loops. In office hours, I learned that you can use the \verb|register| keyword to map a variable to a register rather than loading from memory. This drastically brought down the overhead of Ld/St used by \verb|lw| and used \verb|li| instead. This was applicable to any other variables as they do not need to be stored from the stack.
 
-Then, we added a bunch of branch code, such as \verb|if| statements to induce branch instructions from the compiler. To debug we had to look at the dump to make sure how the compiler was detecting our C code. We noticed that if we aren't doing anything useful to dummy variables, as the compiler will often ignore the code and not include the computation in assembly/machine code. To overcome this, we had to make sure we re-use the variable, in this case I used \verb|x| at the end to ensure that we are doing something "useful", and that "usefulness" is returning \verb|x| as the return value by setting it to 0.
+I found that 2 for loops is just the right amount of loops to include. As adding more for loops gave diminishing returns due to more registers needing to load the loop condition, thus using slightly more arithmetic operations.
 
-Looking at the dump gave us this.
+Then, we added a bunch of branch code, such as \verb|if| statements to induce branch instructions from the compiler. To debug we had to look at the dump to make sure how the compiler was detecting our C code. We noticed that if we aren't doing anything useful to dummy variables, as the compiler will often ignore the code and not include the computation in assembly/machine code. To overcome this, we had to make sure we re-use the variable, in this case I used \verb|x| at the end to ensure that we are doing something ``useful", and that ``usefulness" is returning \verb|x| as the return value by setting it to 0.
+
+Another thing to note is that we decremented the iteration variables rather than increment it, as we noticed that we can avoid another arithmetic instruction that needs to use \verb|li| (that really decomposes to an \verb|addi| instruction). Instead, we can just decrement and check that \verb|beqz| (\textbf{B}ranch if \textbf{EQ}ual to \textbf{Z}ero). That boosts the weight percentage of branch instructions a bit more.
+
+Utilizing the techniques above gave us this assembly dump:
 \lstset{language=[RISC-V]{Assembler}}
 \begin{lstlisting}
 80001048 <main>:
@@ -225,10 +229,6 @@ Looking at the dump gave us this.
 800010b8:	01010113          	addi	sp,sp,16
 800010bc:	00008067          	ret
 \end{lstlisting}
-
-% TODO: do a deeper analysis of my findings here:
-At first, I knew that the two initial for loops were indicated by \verb|bnez|. I had to decrement the iteration variable instead of increment, just so I can track easier which instruction 
-
 \newpage
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -238,7 +238,7 @@ At first, I knew that the two initial for loops were indicated by \verb|bnez|. I
 The directed portion took around 6 hours. Mostly, it was getting setup and running scripts, which was done asynchronously for me while doing other stuff. \\ \\
 The open ended portion took 3 hours. It was a challenge to develop a program that executes a lot of branch instructions while thinking about how the compiler would generate assembly code. \\ \\
 This lab was fun, but I wish there were more coding to do. The directed portion felt like a data analysis section, but it was actually fun analyzing the different benchmarks. The open ended was by far the most fun, because you get exposed to the whole stack from high level C code to low level assembly. I especially had fun working with the RISC-V gnu compiler and seeing how my C code translates to RISC-V, as I've been used to analyzing C code translating to x86. 
-I learnt that there are many ways evaluating CPU performance as well as observing and justifying trade-off between certain design decisions.  \\ \\
+I learnt that there are many ways evaluating CPU performance as well as observing and justifying trade-off between certain design decisions. It's very interesting to see the close relationship and connections you can make between an architecture and software, as a developer. \\ \\
 There's nothing in this lab that needs to be changed, I think it was a good first lab. \\ \\
 Contribution was done individually for each directed part. Then we shared work evenly for open ended, each trying different approaches. I went to OH and found some of the input from other classmates and Josh helpful. 
 My partner Kevin Chang helped me with knowledge about how compilers worked and gave me ideas on what kind of algorithms or C syntax can exploit branch type instructions. Every member of the team contributed fairly.
