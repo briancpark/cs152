@@ -26,6 +26,9 @@ The benchmark that has the highest arithmetic intensity is multiply, which makes
 
 \newpage
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Question 3.5
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section*{(Directed) Problem 3.5}
 
 \centerline{\includegraphics[width=7in]{../labs/lab1/figures/3_5_1.png}}
@@ -83,6 +86,9 @@ The plot above shows the comparison of CPIs between the originally given problem
 
 \newpage
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Question 3.6
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section*{(Directed) Problem 3.6}
 
 \centerline{\includegraphics[width=7in]{../labs/lab1/figures/3_6.png}}
@@ -128,10 +134,108 @@ between the Execute/ Address Calculation and Memory Access stage. Thus, the smal
 
 \newpage
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Question 4.1
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section*{(Open-ended) Problem 4.1}
+Below is the code that achieved 71.099\% on the branch instructions.
+\lstset{language=c}
+\begin{lstlisting}
+int main(void) {
+    register int x;
+    for (register int i = 100; i; i--) {
+        for (register int j = 100; j; j--) {
+            if (i) {
+                if (j) {
+                    if (i) {
+                        if (!j) {
+                            x--;
+                        } else {
+                            x++;
+                        }
+                    }
+                } 
+            } 
+        }
+    }
+    x = 0;
+    return x;
+}
+\end{lstlisting}
 
+
+\begin{table}[ht]
+\caption{Instruction Breakdown} % title of Table
+\centering % used for centering table
+\begin{tabular}{c c} % centered columns (4 columns)
+\hline\hline %inserts double horizontal lines
+Type & Percentage \\ [0.5ex] % inserts table
+%heading
+\hline % inserts single horizontal line
+Arithmetic & 28.705 \\
+Ld/St & 0.028 \\
+Branch/Jump & 71.261 \\
+Branch & 71.099 \\
+Jump & 0.163 \\
+Misc. & 0.006 \\
+[1ex] % [1ex] adds vertical space
+\hline %inserts single line
+\end{tabular}
+\label{table:nonlin} % is used to refer this table in the text
+\end{table}
+
+
+
+
+
+To achieve this high percentage of branch instructions, we had to overcome the optimizations that the compiler imposed, even with \verb|-O0| C flag set, making this percentage difficult to achieve. Trying to lower down the number of arithmetic instructions was hard, as we wanted to utilize for loops to increase the branching instructions. We also had to modify the \verb|tracer.py| framework to separate the distinction between branches and jumps.
+
+First, I noticed that the Ld/St percentage was really high when dealing with for loops. In office hours, I learned that you can use the \verb|register| keyword to map a variable to a register rather than loading from memory. This drastically brought down the overhead of \verb|lw| and used \verb|li| instead. 
+
+Then, we added a bunch of branch code, such as if statements to induce branch instructions from the compiler. To debug we had to look at the dump to make sure how the compiler was detecting our C code. We noticed that if we aren't doing anything useful to dummy variables, as the compiler will often ignore the code and not include the computation in assembly/machine code. To overcome this, we had to make sure we re-use the variable, in this case \verb|x| at the end to ensure that we are doing something useful, and that usefulness is returning \verb|x| as the return value by setting it to 0.
+
+
+Looking at the dump gave us this.
+\lstset{language=[RISC-V]{Assembler}}
+\begin{lstlisting}
+80001048 <main>:
+80001048:	ff010113          	addi	sp,sp,-16
+8000104c:	00812623          	sw	s0,12(sp)
+80001050:	00912423          	sw	s1,8(sp)
+80001054:	01212223          	sw	s2,4(sp)
+80001058:	01312023          	sw	s3,0(sp)
+8000105c:	01010413          	addi	s0,sp,16
+80001060:	06400493          	li	s1,100
+80001064:	0340006f          	j	80001098 <main+0x50>
+80001068:	06400913          	li	s2,100
+8000106c:	0240006f          	j	80001090 <main+0x48>
+80001070:	00048e63          	beqz	s1,8000108c <main+0x44>
+80001074:	00090c63          	beqz	s2,8000108c <main+0x44>
+80001078:	00048a63          	beqz	s1,8000108c <main+0x44>
+8000107c:	00091663          	bnez	s2,80001088 <main+0x40>
+80001080:	fff98993          	addi	s3,s3,-1
+80001084:	0080006f          	j	8000108c <main+0x44>
+80001088:	00198993          	addi	s3,s3,1
+8000108c:	fff90913          	addi	s2,s2,-1
+80001090:	fe0910e3          	bnez	s2,80001070 <main+0x28>
+80001094:	fff48493          	addi	s1,s1,-1
+80001098:	fc0498e3          	bnez	s1,80001068 <main+0x20>
+8000109c:	00000993          	li	s3,0
+800010a0:	00098793          	mv	a5,s3
+800010a4:	00078513          	mv	a0,a5
+800010a8:	00c12403          	lw	s0,12(sp)
+800010ac:	00812483          	lw	s1,8(sp)
+800010b0:	00412903          	lw	s2,4(sp)
+800010b4:	00012983          	lw	s3,0(sp)
+800010b8:	01010113          	addi	sp,sp,16
+800010bc:	00008067          	ret
+\end{lstlisting}
 
 \newpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Question 5
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section*{(Directed) Problem 5}
 The directed portion took around 6 hours. Mostly, it was getting setup and running scripts, which was done asynchronously for me while doing other stuff. \\
 The open ended portion took 3 hours. It was a challenge to develop a program that executes a lot of branch instructions while thinking about how the compiler would generate assembly code. \\
