@@ -93,35 +93,35 @@ The plot above shows the comparison of CPIs between the originally given problem
 
 \centerline{\includegraphics[width=7in]{../labs/lab1/figures/3_6.png}}
 
-According to figure, disabling bypassing increases the CPI in all benchmarks. Quantitatively that 
+According to figure, disabling bypassing increases the CPI in all benchmarks. Quantitatively that's nearly 2.3x worse for rsort. The least it has affected is multiply with a 1.2x increase in CPI. 
 
 \begin{table}[ht]
 \caption{New CPI for Benchmarks} % title of Table
 \centering % used for centering table
-\begin{tabular}{c c} % centered columns (4 columns)
+\begin{tabular}{c c c c} % centered columns (4 columns)
 \hline\hline %inserts double horizontal lines
-Benchmark & CPI\#1 \\ [0.5ex] % inserts table
+Benchmark & CPI w/ Bypassing & CPI w/ Interlocking & Ratio\\ [0.5ex] % inserts table
 %heading
 \hline % inserts single horizontal line
-dhrystone & 0.666 \\
-median & 0.778 \\
-multiply & 0.819 \\
-qsort & 0.734 \\
-rsort & 0.466 \\
-towers & 0.747 \\
-vvadd & 0.735 \\
+dhrystone & 1.323 & 1.986 & 1.501 \\
+median & 1.469 & 1.888 & 1.285 \\
+multiply & 1.565 & 1.911 & 1.221 \\
+qsort & 1.421 & 1.935 & 1.362 \\
+rsort & 1.083 & 2.323 & 2.145 \\
+towers & 1.25 & 1.673 & 1.338 \\
+vvadd & 1.351 & 1.839 & 1.361 \\
 [1ex] % [1ex] adds vertical space
 \hline %inserts single line
 \end{tabular}
 \label{table:nonlin} % is used to refer this table in the text
 \end{table}
 
-We see that full bypassing performs better than full interlocking. If adding full bypassing would hurt the cycle time of the processor by 25\%, then the cycle time will most likely not be hurt or remain the same compared to full interlocking. 
+We see that full bypassing performs better than full interlocking. If adding full bypassing would hurt the cycle time of the processor by 25\%, then the cycle time will most likely not be hurt or remain less compared to full interlocking. 
 
 
 \newpage
 \section*{(Directed) Problem 3.7}
-The percentages that the load and store instructions make are displayed below. Interestingly, arithmetic operations are blow up proportionally depending on the number of non-zero offsets for load and stores. For all benchmarks, arithmetic instructions dominate the proportion.
+The percentages that the load and store instructions make are displayed below. Interestingly, arithmetic operations are blown up proportionally depending on the number of non-zero offsets for load and stores. For all benchmarks, arithmetic instructions dominate the proportion.
 
 \centerline{\includegraphics[width=7in]{../labs/lab1/figures/3_7_1.png}}
 
@@ -130,7 +130,7 @@ We see that although there is a percentage increase of arithmetic instructions, 
 \centerline{\includegraphics[width=7in]{../labs/lab1/figures/3_7_2.png}}
 
 I would advise my employer to adopt this new strategy. The percentage of instruction increase ranges from 1.0214\% to 1.1673\% across all benchmarks. Considering the new design saves on energy and doesn't clog the instruction pipeline due to no need to compute offsets
-between the Execute/ Address Calculation and Memory Access stage. Thus, the small percentage increase of instruction, and more utilization of the ALU are not that costly and are good tradeoffs. 
+between the Execute/Address Calculation and Memory Access stage. Thus, the small percentage increase of instruction, and more utilization of the ALU are not that costly and are good trade-offs. 
 
 \newpage
 
@@ -192,7 +192,7 @@ First, I noticed that the Ld/St percentage was really high when dealing with for
 
 I found that 2 for loops is just the right amount of loops to include. As adding more for loops gave diminishing returns due to more registers needing to load the loop condition, thus using slightly more arithmetic operations.
 
-Then, we added a bunch of branch code, such as \verb|if| statements to induce branch instructions from the compiler. To debug we had to look at the dump to make sure how the compiler was detecting our C code. We noticed that if we aren't doing anything useful to dummy variables, as the compiler will often ignore the code and not include the computation in assembly/machine code. To overcome this, we had to make sure we re-use the variable, in this case I used \verb|x| at the end to ensure that we are doing something ``useful", and that ``usefulness" is returning \verb|x| as the return value by setting it to 0.
+Then, we added a bunch of branch code, such as \verb|if| statements to induce branch instructions from the compiler. To debug we had to look at the dump to make sure how the compiler was detecting our C code. We noticed that if we aren't doing anything useful to dummy variables, the compiler will often ignore the code and not include the computation in assembly/machine code. To overcome this, we had to make sure we re-use the variable. In this case, I used \verb|x| at the end to ensure that we are doing something ``useful", and that ``usefulness" is returning \verb|x| as the return value by setting it to 0.
 
 Another thing to note is that we decremented the iteration variables rather than increment it, as we noticed that we can avoid another arithmetic instruction that needs to use \verb|li| (that really decomposes to an \verb|addi| instruction). Instead, we can just decrement and check that \verb|beqz| (\textbf{B}ranch if \textbf{EQ}ual to \textbf{Z}ero). That boosts the weight percentage of branch instructions a bit more.
 
