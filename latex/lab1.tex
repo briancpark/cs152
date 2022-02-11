@@ -196,6 +196,8 @@ Then, we added a bunch of branch code, such as \verb|if| statements to induce br
 
 Another thing to note is that we decremented the iteration variables rather than increment it, as we noticed that we can avoid another arithmetic instruction that needs to use \verb|li| (that really decomposes to an \verb|addi| instruction). Instead, we can just decrement and check that \verb|beqz| (\textbf{B}ranch if \textbf{EQ}ual to \textbf{Z}ero). That boosts the weight percentage of branch instructions a bit more.
 
+The resulting CPI for the code is 2.003. Interestingly, as more branches were added, the CPI decreased. Adding branches seems to be amortizing the cost of cycles from other instructions, as more SB instructions were being added, the less the CPI got. We think that loads and stores are the dominating factor of high CPI, since it takes a few cycles to fetch from main memory.
+
 Utilizing the techniques above gave us this assembly dump:
 \lstset{language=[RISC-V]{Assembler}}
 \begin{lstlisting}
