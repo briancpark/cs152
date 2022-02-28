@@ -16,230 +16,95 @@
 \begin{document}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Question 3
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{(Directed) Problem 3: Matrix Transposition Case Study}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Question 3.3
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection*{3.3 Matrix Transposition Case Study}
+\begin{Parts}
+	\Part How many cycles does the transpose operation take? \\
+		The transpose operation takes 1350476 cycles.
+	\Part What is the miss rate of the L1 data cache? \\
+		The miss rate of the L1 data cache is $\frac{18661}{16384 + 16407}$. The total number of memory accesses is found by counting the number of loads and stores. Therefore, the miss rate is 56.9\%.
+	\Part Why does the naive transpose code result in non-ideal cache performance? \\
+		The code has to transfer data diagonally through the matrix. If the matrix being transposed is fairly large, then a large stride access can hurt cache hits and memory performance.
+	\Part Which memory access in the code incurs the most misses, and why? \\
+		Obviously, this line of code: \verb|dst[j][i] = src[i][j];| incurs the most misses. Specifically, writing to \verb|dst[j][i]| will incur the most since the CPU will have already loaded \verb|src[i][j]| to a register from memory, but when it wants to write to \verb|dst[j][i]|, it will most likely miss the cache and stall for a memory fetch. 
+\end{Parts}
+\newpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Question 3.4
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section*{(Directed) Problem 3.4}
-
-\centerline{\includegraphics[width=7in]{../labs/lab1/figures/3_4.png}}
-
-The benchmark that has the highest arithmetic intensity is multiply, which makes sense as a lot of arithmetic operations would be happening. The benchmark that seems to be the most memory bound is the Hanoi towers benchmark. This makes sense if the algorithm used is the recursive algorithm, causing a lot of stack frame allocation. Benchmark that seems dependent on branch prediction performance is median. This makes sense as you would have a lot of control statements dependent on sorting. The quicksort benchmark also shows similar intensities per instruction due to this.
-
+\subsection*{3.4 Cache Blocking}
+\begin{Parts}
+	\Part For the given matrix dimensions, what is the optimal blocking factor B? \\
+	The optimal blocking is $8\times8$. Also, some loop ordering needed to be swapped in order for this to be cache optimal.
+	\Part What is the performance improvement using cache blocking over the naive code? \\
+	This achieves a miss rate of 21.21\%, which is an improvement over naive code by 2.68 times.
+	\Part It turns out that the block size B×B which yields the lowest miss rate is much smaller than what one might expect based solely on the 4 KiB capacity of the L1 data cache. What is the reason for this? (Hint: Consider the access pattern within a block, particularly how the rows of the rectangular matrices map to cache sets and which type of cache misses dominate for larger B.) \\
+	Considering that the L1 cache is 4KiB, this can hold 1024 32 bit integers. Since the matrix to be transposed will be accessed in column major, this will incur much more cache misses. That is why the block size is much smaller.
+\end{Parts}
 \newpage
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Question 3.5
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section*{(Directed) Problem 3.5}
-
-\centerline{\includegraphics[width=7in]{../labs/lab1/figures/3_5_1.png}}
-
-The overall CPI of the machine for each benchmark is as follows:
+\subsection*{3.5 Cache Parameters}
+\begin{Parts}
+	\Part How does performance and miss rate change when associativity is increased? \\
+	When the associativity is increased, the miss rate worsens. The table below shows the relationship between the number of ways in the cache and the miss rate.
 
 \begin{table}[ht]
-\caption{New CPI for Benchmarks} % title of Table
+\caption{$N$-Way Set Associativity vs. Miss Rate} % title of Table
 \centering % used for centering table
 \begin{tabular}{c c} % centered columns (4 columns)
 \hline\hline %inserts double horizontal lines
-Benchmark & CPI\#1 \\ [0.5ex] % inserts table
+$N$ & Miss Rate \\ [0.5ex] % inserts table
 %heading
 \hline % inserts single horizontal line
-dhrystone & 1.475 \\
-median & 1.501 \\
-multiply & 1.209 \\
-qsort & 1.465 \\
-rsort & 1.376 \\
-towers & 1.502 \\
-vvadd & 1.423 \\
+1-way & 21.21\% \\
+2-way & 24.54\% \\
+4-way & 28.05\% \\
+8-way & 31.72\% \\
 [1ex] % [1ex] adds vertical space
 \hline %inserts single line
 \end{tabular}
 \label{table:nonlin} % is used to refer this table in the text
 \end{table}
+	
 
-\centerline{\includegraphics[width=7in]{../labs/lab1/figures/3_5_2.png}}
-
-For the case that loads and stores are sped up to have an average CPI of 1, then the new CPIs are as follows:
-\begin{table}[ht]
-\caption{New CPI for Benchmarks} % title of Table
-\centering % used for centering table
-\begin{tabular}{c c} % centered columns (4 columns)
-\hline\hline %inserts double horizontal lines
-Benchmark & CPI\#1 \\ [0.5ex] % inserts table
-%heading
-\hline % inserts single horizontal line
-dhrystone & 1.121 \\
-median & 1.18 \\
-multiply & 1.16 \\
-qsort & 1.151 \\
-rsort & 1.028 \\
-towers & 1.08 \\
-vvadd & 1.118 \\
-[1ex] % [1ex] adds vertical space
-\hline %inserts single line
-\end{tabular}
-\label{table:nonlin} % is used to refer this table in the text
-\end{table}
-
-\centerline{\includegraphics[width=7in]{../labs/lab1/figures/3_5_3.png}}
-
-The plot above shows the comparison of CPIs between the originally given problem prompt and the one optimized with loads and stores. We see that this is an improvements for benchmarks like dhrystone, rsort, and towers. Unfortunately, there is not much of an improvement else where. For just a small speedup, it's not that worthwhile for all the benchmarks. Because there is not one dominating category of instructions for each of the benchmark, the modifications get diluted down in terms of total CPI.
-
+	\Part Explain why higher associativity is or is not beneficial for this particular kernel. \\
+	A higher associativity is not beneficial since transposing takes advantage of spatial locality.
+\end{Parts}
 \newpage
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Question 3.6
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section*{(Directed) Problem 3.6}
-
-\centerline{\includegraphics[width=7in]{../labs/lab1/figures/3_6.png}}
-
-According to figure, disabling bypassing increases the CPI in all benchmarks. Quantitatively that's nearly 2.3x worse for rsort. The least it has affected is multiply with a 1.2x increase in CPI. 
-
-\begin{table}[ht]
-\caption{New CPI for Benchmarks} % title of Table
-\centering % used for centering table
-\begin{tabular}{c c c c} % centered columns (4 columns)
-\hline\hline %inserts double horizontal lines
-Benchmark & CPI w/ Bypassing & CPI w/ Interlocking & Ratio\\ [0.5ex] % inserts table
-%heading
-\hline % inserts single horizontal line
-dhrystone & 1.323 & 1.986 & 1.501 \\
-median & 1.469 & 1.888 & 1.285 \\
-multiply & 1.565 & 1.911 & 1.221 \\
-qsort & 1.421 & 1.935 & 1.362 \\
-rsort & 1.083 & 2.323 & 2.145 \\
-towers & 1.25 & 1.673 & 1.338 \\
-vvadd & 1.351 & 1.839 & 1.361 \\
-[1ex] % [1ex] adds vertical space
-\hline %inserts single line
-\end{tabular}
-\label{table:nonlin} % is used to refer this table in the text
-\end{table}
-
-We see that full bypassing performs better than full interlocking. If adding full bypassing would hurt the cycle time of the processor by 25\%, then the cycle time will most likely not be hurt or remain less compared to full interlocking. 
-
+\subsection*{3.6 Multi-level Caches}
+\begin{Parts}
+	\Part Does adding another level of cache blocking improve performance compared to your previous code from 3.5? Why or why not? (Hint: Consider whether there is any locality left for the L2 cache to exploit.) \\
+\end{Parts}
 
 \newpage
-\section*{(Directed) Problem 3.7}
-The percentages that the load and store instructions make are displayed below. Interestingly, arithmetic operations are blown up proportionally depending on the number of non-zero offsets for load and stores. For all benchmarks, arithmetic instructions dominate the proportion.
-
-\centerline{\includegraphics[width=7in]{../labs/lab1/figures/3_7_1.png}}
-
-We see that although there is a percentage increase of arithmetic instructions, when we look at how many instructions are executed in total is only a small percentage of increase due to the extra arithmetic instruction for fixing the offset before passing the register for memory access.
-
-\centerline{\includegraphics[width=7in]{../labs/lab1/figures/3_7_2.png}}
-
-I would advise my employer to adopt this new strategy. The percentage of instruction increase ranges from 1.0214\% to 1.1673\% across all benchmarks. Considering the new design saves on energy and doesn't clog the instruction pipeline due to no need to compute offsets
-between the Execute/Address Calculation and Memory Access stage. Thus, the small percentage increase of instruction, and more utilization of the ALU are not that costly and are good trade-offs. 
-
-\newpage
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Question 4.1
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section*{(Open-ended) Problem 4.1}
-My partner for the open-ended portion was Kevin Chang.
-
-Below is the code that achieved 71.099\% on the branch instructions.
-\lstset{language=c}
-\begin{lstlisting}
-int main(void) {
-    register int x;
-    for (register int i = 100; i; i--) {
-        for (register int j = 100; j; j--) {
-            if (i) {
-                if (j) {
-                    if (i) {
-                        if (!j) {
-                            x--;
-                        } else {
-                            x++;
-                        }
-                    }
-                } 
-            } 
-        }
-    }
-    x = 0;
-    return x;
-}
-\end{lstlisting}
-
-
-\begin{table}[ht]
-\caption{Instruction Breakdown} % title of Table
-\centering % used for centering table
-\begin{tabular}{c c} % centered columns (4 columns)
-\hline\hline %inserts double horizontal lines
-Type & Percentage \\ [0.5ex] % inserts table
-%heading
-\hline % inserts single horizontal line
-Arithmetic & 28.705 \\
-Ld/St & 0.028 \\
-Branch/Jump & 71.261 \\
-Branch & 71.099 \\
-Jump & 0.163 \\
-Misc. & 0.006 \\
-[1ex] % [1ex] adds vertical space
-\hline %inserts single line
-\end{tabular}
-\label{table:nonlin} % is used to refer this table in the text
-\end{table}
-
-To achieve this high percentage of branch instructions, we had to overcome the optimizations that the compiler imposed, even with \verb|-O0| C flag set, making this percentage difficult to achieve. Trying to lower down the number of arithmetic instructions was challenging, as we wanted to utilize for loops to increase the branching instructions. We also had to modify the \verb|tracer.py| framework to separate the distinction between branches and jumps.
-
-First, I noticed that the Ld/St percentage was really high when dealing with for loops. In office hours, I learned that you can use the \verb|register| keyword to map a variable to a register rather than loading from memory. This drastically brought down the overhead of Ld/St used by \verb|lw| and used \verb|li| instead. This was applicable to any other variables as they do not need to be stored from the stack.
-
-I found that 2 for loops is just the right amount of loops to include. As adding more for loops gave diminishing returns due to more registers needing to load the loop condition, thus using slightly more arithmetic operations.
-
-Then, we added a bunch of branch code, such as \verb|if| statements to induce branch instructions from the compiler. To debug we had to look at the dump to make sure how the compiler was detecting our C code. We noticed that if we aren't doing anything useful to dummy variables, the compiler will often ignore the code and not include the computation in assembly/machine code. To overcome this, we had to make sure we re-use the variable. In this case, I used \verb|x| at the end to ensure that we are doing something ``useful", and that ``usefulness" is returning \verb|x| as the return value by setting it to 0.
-
-Another thing to note is that we decremented the iteration variables rather than increment it, as we noticed that we can avoid another arithmetic instruction that needs to use \verb|li| (that really decomposes to an \verb|addi| instruction). Instead, we can just decrement and check that \verb|beqz| (\textbf{B}ranch if \textbf{EQ}ual to \textbf{Z}ero). That boosts the weight percentage of branch instructions a bit more.
-
-The resulting CPI for the code is 2.003. Interestingly, as more branches were added, the CPI decreased. Adding branches seems to be amortizing the cost of cycles from other instructions, as more SB instructions were being added, the less the CPI got. We think that loads and stores are the dominating factor of high CPI, since it takes a few cycles to fetch from main memory.
-
-Utilizing the techniques above gave us this assembly dump:
-\lstset{language=[RISC-V]{Assembler}}
-\begin{lstlisting}
-80001048 <main>:
-80001048:	ff010113          	addi	sp,sp,-16
-8000104c:	00812623          	sw	s0,12(sp)
-80001050:	00912423          	sw	s1,8(sp)
-80001054:	01212223          	sw	s2,4(sp)
-80001058:	01312023          	sw	s3,0(sp)
-8000105c:	01010413          	addi	s0,sp,16
-80001060:	06400493          	li	s1,100
-80001064:	0340006f          	j	80001098 <main+0x50>
-80001068:	06400913          	li	s2,100
-8000106c:	0240006f          	j	80001090 <main+0x48>
-80001070:	00048e63          	beqz	s1,8000108c <main+0x44>
-80001074:	00090c63          	beqz	s2,8000108c <main+0x44>
-80001078:	00048a63          	beqz	s1,8000108c <main+0x44>
-8000107c:	00091663          	bnez	s2,80001088 <main+0x40>
-80001080:	fff98993          	addi	s3,s3,-1
-80001084:	0080006f          	j	8000108c <main+0x44>
-80001088:	00198993          	addi	s3,s3,1
-8000108c:	fff90913          	addi	s2,s2,-1
-80001090:	fe0910e3          	bnez	s2,80001070 <main+0x28>
-80001094:	fff48493          	addi	s1,s1,-1
-80001098:	fc0498e3          	bnez	s1,80001068 <main+0x20>
-8000109c:	00000993          	li	s3,0
-800010a0:	00098793          	mv	a5,s3
-800010a4:	00078513          	mv	a0,a5
-800010a8:	00c12403          	lw	s0,12(sp)
-800010ac:	00812483          	lw	s1,8(sp)
-800010b0:	00412903          	lw	s2,4(sp)
-800010b4:	00012983          	lw	s3,0(sp)
-800010b8:	01010113          	addi	sp,sp,16
-800010bc:	00008067          	ret
-\end{lstlisting}
+\section*{(Open-ended) Problem 4.1: Validation and Reverse Engineering of Memory Hierarchies}
+\section*{(Open-ended) Problem 4.2: Design Your Own Hardware Prefetcher}
+\section*{(Open-ended) Problem 4.3: Design Your Own Replacement Policy and Victim Cache}
 \newpage
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Question 5
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section*{(Directed) Problem 5}
-The directed portion took around 6 hours. Mostly, it was getting setup and running scripts, which was done asynchronously for me while doing other stuff. \\ \\
+\section*{(Directed) Problem 5: Feedback}
+The directed portion took around 10 hours. Mostly, it was getting setup and running scripts, which was done asynchronously for me while doing other stuff. \\ \\
+
+
+%%TODO
 The open ended portion took 3 hours. It was a challenge to develop a program that executes a lot of branch instructions while thinking about how the compiler would generate assembly code. \\ \\
 This lab was fun, but I wish there were more coding to do. The directed portion felt like a data analysis section, but it was actually fun analyzing the different benchmarks. The open ended was by far the most fun, because you get exposed to the whole stack from high level C code to low level assembly. I especially had fun working with the RISC-V gnu compiler and seeing how my C code translates to RISC-V, as I've been used to analyzing C code translating to x86. 
 I learnt that there are many ways evaluating CPU performance as well as observing and justifying trade-off between certain design decisions. It's very interesting to see the close relationship and connections you can make between an architecture and software, as a developer. \\ \\
