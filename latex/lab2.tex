@@ -41,6 +41,27 @@
 % Question 3.4
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection*{3.4 Cache Blocking}
+\lstset{language=c}
+\begin{lstlisting}
+#define min(a, b) (((a) < (b)) ? (a) : (b))
+
+void __attribute__ ((noinline)) transpose(mat_nxm_t dst, const mat_mxn_t src)
+{
+    register size_t i, j, l, k;
+    register size_t blocksize = 8;
+    
+    for (i = 0; i < MAT_M; i += blocksize) {
+        for (j = 0; j < MAT_N; j += blocksize) {    
+            for (l = j; l < min(j + blocksize, MAT_N); ++l) {
+                for (k = i; k < min(i + blocksize, MAT_M); ++k) {
+                    dst[l][k] = src[k][l];
+                }
+            }
+        }
+    }
+}
+\end{lstlisting}
+
 \begin{Parts}
 	\Part For the given matrix dimensions, what is the optimal blocking factor B? \\
 	The optimal blocking is $8\times8$. Also, some loop ordering needed to be swapped in order for this to be cache optimal.
@@ -49,6 +70,8 @@
 	\Part It turns out that the block size B×B which yields the lowest miss rate is much smaller than what one might expect based solely on the 4 KiB capacity of the L1 data cache. What is the reason for this? (Hint: Consider the access pattern within a block, particularly how the rows of the rectangular matrices map to cache sets and which type of cache misses dominate for larger B.) \\
 	Considering that the L1 cache is 4KiB, this can hold 1024 32 bit integers. Since the matrix to be transposed will be accessed in column major, this will incur much more cache misses. That is why the block size is much smaller.
 \end{Parts}
+
+
 \newpage
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -87,14 +110,40 @@ $N$ & Miss Rate \\ [0.5ex] % inserts table
 % Question 3.6
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection*{3.6 Multi-level Caches}
+\lstset{language=c}
+\begin{lstlisting}
+#define min(a, b) (((a) < (b)) ? (a) : (b))
+
+void __attribute__ ((noinline)) transpose(mat_nxm_t dst, const mat_mxn_t src)
+{
+    register size_t i, j, l1, k1, l2, k2;
+    register size_t l1_blocksize = 8;
+    register size_t l2_blocksize = 64;
+    
+    for (i = 0; i < MAT_M; i += l2_blocksize) {
+        for (j = 0; j < MAT_N; j += l2_blocksize) {
+            for (l1 = j; l1 < j + l2_blocksize; l1 += l1_blocksize) {
+                for (k1 = i; k1 < i + l2_blocksize; k1 += l1_blocksize) {
+                    for (l2 = l1; l2 < min(l1 + l1_blocksize, MAT_N); l2++) {
+                        for (k2 = k1; k2 < min(k1 + l1_blocksize, MAT_M); k2++) {
+                            dst[l2][k2] = src[k2][l2];
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+\end{lstlisting}
+
 \begin{Parts}
-	\Part Does adding another level of cache blocking improve performance compared to your previous code from 3.5? Why or why not? (Hint: Consider whether there is any locality left for the L2 cache to exploit.) \\
+	\Part Does adding another level of cache blocking improve performance compared to your previous code from 3.5? Why or why not? (\textbf{Hint}: Consider whether there is any locality left for the L2 cache to exploit.) \\
+	Adding another level of cache blocking didn't improve performance compared to just L1 cache blocking, just stayed nearly the same. Using the same L1 block size of $8\times8$ and using $64\times64$ as the L2 kernel size, this gave us a miss rate of 21.23\%. This is probably due to no locality being left over. But what did improve was the number of cycles, as traversing the memory hierarchy induces less cycles or fetches to main memory, reducing the AMAT overall. It went from 527174 cycles to 432253 cycles.
 \end{Parts}
 
 \newpage
 \section*{(Open-ended) Problem 4.1: Validation and Reverse Engineering of Memory Hierarchies}
-\section*{(Open-ended) Problem 4.2: Design Your Own Hardware Prefetcher}
-\section*{(Open-ended) Problem 4.3: Design Your Own Replacement Policy and Victim Cache}
+
 \newpage
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
