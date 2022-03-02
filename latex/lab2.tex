@@ -33,7 +33,7 @@
 	\Part Why does the naive transpose code result in non-ideal cache performance? \\
 		The code has to transfer data diagonally through the matrix. If the matrix being transposed is fairly large, then a large stride access can hurt cache hits and memory performance. Note that it's really doing a transformation from row major to column major order, so cache performance will definitely take a hit.
 	\Part Which memory access in the code incurs the most misses, and why? \\
-		Obviously, this line of code: \verb|dst[j][i] = src[i][j]| incurs the most misses. Specifically, writing to \verb|dst[j][i]| will incur the most since the CPU will have already loaded \verb|src[i][j]| to a register from memory, but when it wants to write to \verb|dst[j][i]|, it will most likely miss the cache and stall for a memory fetch. 
+		Obviously, this line of code: \verb|dst[j][i] = src[i][j]| incurs the most misses. Specifically, writing to \verb|dst[j][i]| will incur the most since the CPU will have already loaded \verb|src[i][j]| to a register from memory, but when it wants to write to \verb|dst[j][i]|, it will most likely miss the cache and stall for a memory fetch. Also note that \verb|dst| will be accessed in column major order when the matrix is stored as row major.
 \end{Parts}
 \newpage
 
@@ -70,8 +70,6 @@ void __attribute__ ((noinline)) transpose(mat_nxm_t dst, const mat_mxn_t src)
 	\Part It turns out that the block size B×B which yields the lowest miss rate is much smaller than what one might expect based solely on the 4 KiB capacity of the L1 data cache. What is the reason for this? (Hint: Consider the access pattern within a block, particularly how the rows of the rectangular matrices map to cache sets and which type of cache misses dominate for larger B.) \\
 	Considering that the L1 cache is 4KiB, this can hold 1024 32 bit integers. Since the matrix to be transposed will be accessed in column major, this will incur much more cache misses. That is why the block size is much smaller.
 \end{Parts}
-
-
 \newpage
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -102,7 +100,7 @@ $N$ & Miss Rate \\ [0.5ex] % inserts table
 	
 
 	\Part Explain why higher associativity is or is not beneficial for this particular kernel. \\
-	A higher associativity is not beneficial since transposing takes advantage of spatial locality.
+	A higher associativity is not beneficial since transposing takes advantage of spatial locality. With higher associativity, we bring in fewer elements, thus spatial locality is not being taken advantage of. 
 \end{Parts}
 \newpage
 
@@ -142,6 +140,10 @@ void __attribute__ ((noinline)) transpose(mat_nxm_t dst, const mat_mxn_t src)
 \end{Parts}
 
 \newpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Question 4
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section*{(Open-ended) Problem 4.1: Validation and Reverse Engineering of Memory Hierarchies}
 My partner for the open ended portion was with Kevin Chang. His submission includes the main copy, please refer to his submission.
 
@@ -151,11 +153,15 @@ My partner for the open ended portion was with Kevin Chang. His submission inclu
 % Question 5
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section*{(Directed) Problem 5: Feedback}
-The directed portion took around 10 hours. Mostly, it was getting setup and running scripts, which was done asynchronously for me while doing other stuff. \\ \\
+The directed portion took around 10 hours. Mostly, it was getting setup and running scripts, which was done asynchronously for me while doing other stuff. This lab took really long with compilation/simulation. For the future, I wish there are options to run locally on a Docker or VM. I would like to take advantage of my own hardware if that speeds up anything.
 
+We spent nearly 10 hours on open-ended portion as well. This was really fun reverse engineering. Usually, I use Linux tools like \verb|htop| or \verb|lscpu| to know my hardware. This time it was fun to blindly figure out by reverse engineering. Can't wait to see if our results were at all close to the mystery configuration!
 
+I learned how to empirically analyze and engineer assembly/C code. I think having this intuition and knowledge behind performance is definitely beneficial in my future career and current works in research!
+
+There is nothing that I would like to change.
 
 Contribution was done individually for each directed part. Then we shared work evenly for open ended, each trying different approaches. I went to OH and found some of the input from other classmates and Josh helpful. 
-My partner Kevin Chang helped me with knowledge about how compilers worked and gave me ideas on what kind of algorithms or C syntax can exploit branch type instructions. Every member of the team contributed fairly.
+My partner Kevin Chang contributed mostly to finding more about the data cache, while I contributed by reverse engineering specifications about the instruction cache.
 
 \end{document}
