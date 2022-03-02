@@ -31,9 +31,9 @@
 	\Part What is the miss rate of the L1 data cache? \\
 		The miss rate of the L1 data cache is $\frac{18661}{16384 + 16407}$. The total number of memory accesses is found by counting the number of loads and stores. Therefore, the miss rate is 56.9\%.
 	\Part Why does the naive transpose code result in non-ideal cache performance? \\
-		The code has to transfer data diagonally through the matrix. If the matrix being transposed is fairly large, then a large stride access can hurt cache hits and memory performance.
+		The code has to transfer data diagonally through the matrix. If the matrix being transposed is fairly large, then a large stride access can hurt cache hits and memory performance. Note that it's really doing a transformation from row major to column major order, so cache performance will definitely take a hit.
 	\Part Which memory access in the code incurs the most misses, and why? \\
-		Obviously, this line of code: \verb|dst[j][i] = src[i][j];| incurs the most misses. Specifically, writing to \verb|dst[j][i]| will incur the most since the CPU will have already loaded \verb|src[i][j]| to a register from memory, but when it wants to write to \verb|dst[j][i]|, it will most likely miss the cache and stall for a memory fetch. 
+		Obviously, this line of code: \verb|dst[j][i] = src[i][j]| incurs the most misses. Specifically, writing to \verb|dst[j][i]| will incur the most since the CPU will have already loaded \verb|src[i][j]| to a register from memory, but when it wants to write to \verb|dst[j][i]|, it will most likely miss the cache and stall for a memory fetch. 
 \end{Parts}
 \newpage
 
@@ -143,6 +143,7 @@ void __attribute__ ((noinline)) transpose(mat_nxm_t dst, const mat_mxn_t src)
 
 \newpage
 \section*{(Open-ended) Problem 4.1: Validation and Reverse Engineering of Memory Hierarchies}
+My partner for the open ended portion was with Kevin Chang. His submission includes the main copy, please refer to his submission.
 
 \newpage
 
@@ -153,11 +154,7 @@ void __attribute__ ((noinline)) transpose(mat_nxm_t dst, const mat_mxn_t src)
 The directed portion took around 10 hours. Mostly, it was getting setup and running scripts, which was done asynchronously for me while doing other stuff. \\ \\
 
 
-%%TODO
-The open ended portion took 3 hours. It was a challenge to develop a program that executes a lot of branch instructions while thinking about how the compiler would generate assembly code. \\ \\
-This lab was fun, but I wish there were more coding to do. The directed portion felt like a data analysis section, but it was actually fun analyzing the different benchmarks. The open ended was by far the most fun, because you get exposed to the whole stack from high level C code to low level assembly. I especially had fun working with the RISC-V gnu compiler and seeing how my C code translates to RISC-V, as I've been used to analyzing C code translating to x86. 
-I learnt that there are many ways evaluating CPU performance as well as observing and justifying trade-off between certain design decisions. It's very interesting to see the close relationship and connections you can make between an architecture and software, as a developer. \\ \\
-There's nothing in this lab that needs to be changed, I think it was a good first lab. \\ \\
+
 Contribution was done individually for each directed part. Then we shared work evenly for open ended, each trying different approaches. I went to OH and found some of the input from other classmates and Josh helpful. 
 My partner Kevin Chang helped me with knowledge about how compilers worked and gave me ideas on what kind of algorithms or C syntax can exploit branch type instructions. Every member of the team contributed fairly.
 
