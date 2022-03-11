@@ -1,0 +1,375 @@
+\documentclass[11pt]{article}
+\usepackage{cs152}
+
+%%%%%%%%%%%%%%%%%%%% name/id
+\rfoot{\small Brian Park | 3033045069}
+
+
+%%%%%%%%%%%%%%%%%%%% Course/HW info
+\newcommand*{\instr}{John Wawrzynek}
+\newcommand*{\term}{Spring 2022}
+\newcommand*{\coursenum}{CS 152}
+\newcommand*{\coursename}{Computer Architecture and Engineering}
+\newcommand*{\hwnum}{3}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Document Start %%%%%%%%%%%%%%%%%
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Question 3
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{(Directed) Problem 3.3: Performance Bottlenecks}
+
+dhrystone median multiply qsort spmv towers vvadd
+
+ 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Question 3.3
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection*{3.3 Matrix Transposition Case Study}
+\begin{Parts}
+	\Part How many cycles does the transpose operation take? \\
+		The transpose operation takes 1350476 cycles.
+	\Part What is the miss rate of the L1 data cache? \\
+		The miss rate of the L1 data cache is $\frac{18661}{16384 + 16407}$. The total number of memory accesses is found by counting the number of loads and stores. Therefore, the miss rate is 56.9\%.
+	\Part Why does the naive transpose code result in non-ideal cache performance? \\
+		The code has to transfer data diagonally through the matrix. If the matrix being transposed is fairly large, then a large stride access can hurt cache hits and memory performance. Note that it's really doing a transformation from row major to column major order, so cache performance will definitely take a hit.
+	\Part Which memory access in the code incurs the most misses, and why? \\
+		Obviously, this line of code: \verb|dst[j][i] = src[i][j]| incurs the most misses. Specifically, writing to \verb|dst[j][i]| will incur the most since the CPU will have already loaded \verb|src[i][j]| to a register from memory, but when it wants to write to \verb|dst[j][i]|, it will most likely miss the cache and stall for a memory fetch. Also note that \verb|dst| will be accessed in column major order when the matrix is stored as row major.
+\end{Parts}
+\newpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Question 3.4
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection*{3.4 Cache Blocking}
+\lstset{language=c}
+\begin{lstlisting}
+#define min(a, b) (((a) < (b)) ? (a) : (b))
+
+void __attribute__ ((noinline)) transpose(mat_nxm_t dst, const mat_mxn_t src)
+{
+    register size_t i, j, l, k;
+    register size_t blocksize = 8;
+    
+    for (i = 0; i < MAT_M; i += blocksize) {
+        for (j = 0; j < MAT_N; j += blocksize) {    
+            for (l = j; l < min(j + blocksize, MAT_N); ++l) {
+                for (k = i; k < min(i + blocksize, MAT_M); ++k) {
+                    dst[l][k] = src[k][l];
+                }
+            }
+        }
+    }
+}
+\end{lstlisting}
+
+\begin{Parts}
+	\Part For the given matrix dimensions, what is the optimal blocking factor B? \\
+	The optimal blocking is $8\times8$. Also, some loop ordering needed to be swapped in order for this to be cache optimal.
+	\Part What is the performance improvement using cache blocking over the naive code? \\
+	This achieves a miss rate of 21.21\%, which is an improvement over naive code by 2.68 times.
+	\Part It turns out that the block size B×B which yields the lowest miss rate is much smaller than what one might expect based solely on the 4 KiB capacity of the L1 data cache. What is the reason for this? (Hint: Consider the access pattern within a block, particularly how the rows of the rectangular matrices map to cache sets and which type of cache misses dominate for larger B.) \\
+	Considering that the L1 cache is 4KiB, this can hold 1024 32 bit integers. Since the matrix to be transposed will be accessed in column major, this will incur much more cache misses. That is why the block size is much smaller.
+\end{Parts}
+\newpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Question 3.5
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection*{3.5 Cache Parameters}
+\begin{Parts}
+	\Part How does performance and miss rate change when associativity is increased? \\
+	When the associativity is increased, the miss rate worsens. The table below shows the relationship between the number of ways in the cache and the miss rate.
+
+\begin{table}[ht]
+\caption{$N$-Way Set Associativity vs. Miss Rate} % title of Table
+\centering % used for centering table
+\begin{tabular}{c c} % centered columns (4 columns)
+\hline\hline %inserts double horizontal lines
+$N$ & Miss Rate \\ [0.5ex] % inserts table
+%heading
+\hline % inserts single horizontal line
+1-way & 21.21\% \\
+2-way & 24.54\% \\
+4-way & 28.05\% \\
+8-way & 31.72\% \\
+[1ex] % [1ex] adds vertical space
+\hline %inserts single line
+\end{tabular}
+\label{table:nonlin} % is used to refer this table in the text
+\end{table}
+	
+
+	\Part Explain why higher associativity is or is not beneficial for this particular kernel. \\
+	A higher associativity is not beneficial since transposing takes advantage of spatial locality. With higher associativity, we bring in fewer elements, thus spatial locality is not being taken advantage of. 
+\end{Parts}
+\newpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Question 3.6
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection*{3.6 Multi-level Caches}
+\lstset{language=c}
+\begin{lstlisting}
+#define min(a, b) (((a) < (b)) ? (a) : (b))
+
+void __attribute__ ((noinline)) transpose(mat_nxm_t dst, const mat_mxn_t src)
+{
+    register size_t i, j, l1, k1, l2, k2;
+    register size_t l1_blocksize = 8;
+    register size_t l2_blocksize = 64;
+    
+    for (i = 0; i < MAT_M; i += l2_blocksize) {
+        for (j = 0; j < MAT_N; j += l2_blocksize) {
+            for (l1 = j; l1 < j + l2_blocksize; l1 += l1_blocksize) {
+                for (k1 = i; k1 < i + l2_blocksize; k1 += l1_blocksize) {
+                    for (l2 = l1; l2 < min(l1 + l1_blocksize, MAT_N); l2++) {
+                        for (k2 = k1; k2 < min(k1 + l1_blocksize, MAT_M); k2++) {
+                            dst[l2][k2] = src[k2][l2];
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+\end{lstlisting}
+
+\begin{Parts}
+	\Part Does adding another level of cache blocking improve performance compared to your previous code from 3.5? Why or why not? (\textbf{Hint}: Consider whether there is any locality left for the L2 cache to exploit.) \\
+	Adding another level of cache blocking didn't improve performance compared to just L1 cache blocking, just stayed nearly the same. Using the same L1 block size of $8\times8$ and using $64\times64$ as the L2 kernel size, this gave us a miss rate of 21.23\%. This is probably due to no locality being left over. But what did improve was the number of cycles, as traversing the memory hierarchy induces less cycles or fetches to main memory, reducing the AMAT overall. It went from 527174 cycles to 432253 cycles.
+\end{Parts}
+
+\newpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Question 4
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{(Open-ended) Problem 4.1: Validation and Reverse Engineering of Memory Hierarchies}
+My partner for the open ended portion was with Kevin Chang. His submission includes the main copy, please refer to his submission.
+
+\includepdf[pages=1]{plot-CS152RocketMysteryConfig.pdf}
+
+
+We believe the L1 Data Cache is 16kB. We noticed that 4, 8, and 16kB arrays all shared approximately the same cycles per iteration, with a sharp increase after 16kB. In order for this to be the case, their cache hit rates should be almost exactly the same, which is only possible if the cache is large enough to fully fit all 3 arrays. When pointer chasing first starts, random portions of the array are drawn in as cache lines. However, as the entire array is pulled in, every pointer chase after that is extremely fast. \bigbreak
+
+We believe L1 Data Cache has a latency of 3 cycles. The average cycles per iteration is four cycles for 4-16kB. Given the large number of iterations, the average cycle count should be very close to the actual cycle count for a cached read, because once the cache is filled, the large number of fast cached reads rapidly outweighs the number of slow memory reads. We presume writing $idx$ takes 1 cycle,  so the remaining 3 cycles must be spent in the pointer chase. We assume that array bounds checking and index incrementing are not included as part of an iteration's time-to-execute (if so, then L1 latency is 1 cycle). \bigbreak
+
+
+Our L2 cache size we found to be 64KB, with similar reasoning as L1 cache size. The relatively minor change in cycles per iteration implies very similar overall memory access times between the 16kB and 64kB data points, which can only be achieved if approximately the same percentage of the arrays reside in caches. This would have to be 100\% or close to 100\%. \bigbreak
+
+We found L2 cache latency to be 36 cycles. The array of size 8192 has almost exactly a 5x worse cycles per iteration ($21$ versus $4.2$) than the array of size 4096. We presume that on average for every L1 cache hit in the size 4096 array, there is one cache miss that goes to L2 because the pointer chase is randomly distributed. Then, we can setup a multi-level AMAT equation. We assume the L2 miss rate is negligible on average because once the entire array is pulled in, cache hits will vastly outnumber cache misses. 
+\begin{gather*}
+        AMAT = L1HT+L1MR(L2HR +L2MR*L2MP) \\
+    21 = 3 + .5(L2HT + 0*L2MP) \\
+    36 = L2HT
+\end{gather*}
+
+Finally, we found DRAM latency to be 58 cycles. We setup another AMAT to solve for the L2 miss penalty. Similar to solving the L2HT, we found an array that was 8 times larger than what we determined was the L2 cache size. With randomly distributed indices, this should result in an L2 miss rate of 7/8. We plugged this into L2MR variable and solved for L2MP. We were skeptical of this result as it seemed far too low for main memory latency, but were unable to create another test that could measure DRAM latency. \bigbreak
+
+We found our L1 I\$ line size to be 64B in size. We deduced this by running a sequence of \texttt{addi} instructions and noticed that every 15-16 instructions, there would be a jump of around 50 cycles in total cycle count. We believe this to be the code reaching the end of cached instructions and needing to pull in a new line of instructions from lower in the memory hierarchy. Thus,  $16 \times 4 = 64$ bytes as each instruction is 4 bytes. \bigbreak
+
+Some important things to note was setting the compiler level to \verb|-O0|, although it may have negligible effect on how things are compiled from C. But since counting cycles with C was not very intuitive and straightforward, we stuck with assembly with help from a few peers on Piazza. Below is a snippet of how we counted cycles with comments.
+
+\lstset{language=[RISC-V]{Assembler}}
+\begin{lstlisting}
+    addi t0, x0, 1 # 8 cycles
+    addi t1, x0, 1 # 9 cycles
+    addi t2, x0, 1 # 10 cycles
+    addi t3, x0, 1 # 11 cycles
+    addi t4, x0, 1
+    addi t5, x0, 1
+    addi t6, x0, 1
+    addi t0, x0, 1
+    addi t1, x0, 1
+    addi t2, x0, 1
+    addi t3, x0, 1
+    addi t4, x0, 1 # 19 cycles
+    # 48 cycles gap
+    addi t5, x0, 1 # jumps to 67 cycles (indicates a cache miss)
+    addi t6, x0, 1
+    addi t0, x0, 1
+    addi t1, x0, 1
+    addi t2, x0, 1
+    addi t3, x0, 1
+    addi t4, x0, 1
+    addi t5, x0, 1
+    addi t6, x0, 1
+    addi t0, x0, 1
+    addi t1, x0, 1 # 77 cycles
+    addi t2, x0, 1 # 78 cycles
+    addi t3, x0, 1 # 79 cycles
+    addi t4, x0, 1 # 80 cycles
+    addi t5, x0, 1 # 81 cycles
+    addi t6, x0, 1 # 82 cycles
+    # 50 cycles gap
+    addi t0, x0, 1 # 132 cycles
+    ...
+\end{lstlisting}
+
+Some other important things to notice was also avoiding data hazards, and also not using saved registers \verb|s{x}| since those can incur more cycles to to interlocking and calling convention respectively. \bigbreak
+
+We believe L1 I\$ replacement is LRU. We were also lucky to find that the L1 I\$ is 4-way set associative. This is done by writing code that holds 4 sets. We saturated the cache 4 times and made the 5th iteration of accesses read from one of the 4 sets we saturated. This did not incur any drastic difference in cycles (we used 50 cycles as a indicator and used jump instructions to branch to start of the iteration. This means that the cache size is $4 \times 64$ bytes or 256 bytes in total.
+
+In fact, any more saturation of the cache caused the instruction cache to be replaced with LRU replacement policy. Looking at the Rocket chip source code, we realized there is either random replacement or LRU replacement policies available. We deduced that the replacement policy is LRU by saturating the cache 5 times where the LRU would evict the first entry of the cache. When we want to access the first entry again, it will not be resident inside the cache, thus incurring more cycles when it needs to be fetched from lower levels of memory. We noticed a 103 cycle difference due to this. We repeated the code as many times to make sure that the replacement was not random. Below is a snippet of how we tested for LRU using jumps:
+
+\lstset{language=[RISC-V]{Assembler}}
+\begin{lstlisting}
+adder_func:
+    addi a0, x0, 1
+first:
+    addi t0, x0, 1
+    addi t1, x0, 1
+    addi t2, x0, 1
+    addi t3, x0, 1
+    addi t4, x0, 1
+    addi t5, x0, 1
+    addi t6, x0, 1
+    addi t0, x0, 1
+    addi t1, x0, 1
+    addi t2, x0, 1
+    addi t3, x0, 1
+    addi t4, x0, 1
+    beq a0, x0, done
+    # 48 cycles
+    addi t5, x0, 1
+    addi t6, x0, 1
+    addi t0, x0, 1
+    addi t1, x0, 1
+    addi t2, x0, 1
+    addi t3, x0, 1
+    addi t4, x0, 1
+    addi t5, x0, 1
+    addi t6, x0, 1
+    addi t0, x0, 1
+    addi t1, x0, 1
+    addi t2, x0, 1
+    addi t3, x0, 1
+    addi t4, x0, 1
+    addi t5, x0, 1
+    addi t6, x0, 1
+    # 50 cycles gap
+    addi t0, x0, 1
+    addi t1, x0, 1
+    addi t2, x0, 1
+    addi t3, x0, 1
+    addi t4, x0, 1
+    addi t5, x0, 1
+    addi t6, x0, 1
+    addi t0, x0, 1
+    addi t1, x0, 1
+    addi t2, x0, 1
+    addi t3, x0, 1
+    addi t4, x0, 1
+    addi t5, x0, 1
+    addi t6, x0, 1
+    addi t0, x0, 1
+    addi t1, x0, 1
+    # 50 cycle gap
+    addi t2, x0, 1
+    addi t3, x0, 1
+    addi t4, x0, 1
+    addi t5, x0, 1
+    addi t6, x0, 1
+    addi t0, x0, 1
+    addi t1, x0, 1
+    addi t2, x0, 1
+    addi t3, x0, 1
+    addi t4, x0, 1
+    addi t5, x0, 1
+    addi t6, x0, 1
+    addi t0, x0, 1
+    addi t1, x0, 1
+    addi t2, x0, 1
+    addi t3, x0, 1
+    # 52 cycle gap
+    addi t4, x0, 1
+    addi t5, x0, 1
+    addi t6, x0, 1
+    addi t0, x0, 1
+    addi t1, x0, 1
+    addi t2, x0, 1
+    addi t3, x0, 1
+    addi t4, x0, 1
+    addi t5, x0, 1
+    addi t6, x0, 1
+    addi t0, x0, 1
+    addi t1, x0, 1
+    addi t2, x0, 1
+    addi t3, x0, 1
+    
+    # Uncommenting the lines below incurs 401 cycles compared to 298 cycles.
+    # addi t4, x0, 1
+    # addi t5, x0, 1
+    # #52 cycle gap
+    # addi t6, x0, 1
+    # addi t6, x0, 1
+    # addi t0, x0, 1
+    # addi t1, x0, 1
+    # addi t2, x0, 1
+    # addi t3, x0, 1
+    # addi t4, x0, 1
+    # addi t5, x0, 1
+    # addi t6, x0, 1
+    # addi t6, x0, 1
+    # addi t0, x0, 1
+    # addi t1, x0, 1
+    # addi t2, x0, 1
+    # addi t3, x0, 1
+    addi a0, a0, -1
+    j first
+done:
+    ret
+\end{lstlisting}
+
+
+We found our L1 data cache lines to each be 64 bytes long. We determined this with the code below (cycle counting code has been omitted), a simply array copy. We noticed that every 16 elements copied, the cycle count would jump up by 40-100 cycles for one iteration. We determined this was a cache line of array elements being exhausted, requiring the processor to pull in a new line from a lower level.
+
+\lstset{language=c}
+\begin{lstlisting}
+	int a[4000];
+	int k[4000];
+	for (int i = 0; i < 4000; i++) a[i] = 100;
+
+	for (int i = 0; i < 100; i++) {
+    	k[i] = a[i];
+	}
+\end{lstlisting}
+
+L1 D associativity is LRU, we believe. We ran a program to saturate our data cache cache with an array larger than L1 D\$. Then, we stepped back through the array and measured the time to access elements. We found that the elements closest to the end were all fairly fast accesses. As we approached the middle of our array, we noticed an occasional jump in the cycle count, which is a new chunk of the array being pulled into memory. We know from RocketChip's config that eviction can be only LRU, psuedo-LRU or random, and we deduced it was LRU because out of all possible blocks that could be evicted, it was always the one that we had accessed least recently. 
+
+\lstset{language=c}
+\begin{lstlisting}
+	int a[8000];
+	int k;
+	for (int i = 0; i < 8000; i++) a[i] = 100;
+
+	// We took a number of measurements in different ways; 
+	// this code highlights the general structure of our benchmark
+	// We measured the cycle time for each of these accesses.
+	k = a[3999];
+	k = a[2500];
+	k = a[1000];
+	k = a[0];            
+\end{lstlisting}
+
+\newpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Question 5
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{(Directed) Problem 5: Feedback}
+The directed portion took around 10 hours. Mostly, it was getting setup and running scripts, which was done asynchronously for me while doing other stuff. This lab took really long with compilation/simulation. For the future, I wish there are options to run locally on a Docker or VM. I would like to take advantage of my own hardware if that speeds up anything.
+
+We spent nearly 10 hours on open-ended portion as well. This was really fun reverse engineering. Usually, I use Linux tools like \verb|htop| or \verb|lscpu| to know my hardware. This time it was fun to blindly figure out by reverse engineering. Can't wait to see if our results were at all close to the mystery configuration!
+
+I learned how to empirically analyze and engineer assembly/C code. I think having this intuition and knowledge behind performance is definitely beneficial in my future career and current works in research!
+
+There is nothing that I would like to change.
+
+Contribution was done individually for each directed part. Then we shared work evenly for open ended, each trying different approaches. I went to OH and found some of the input from other classmates and Josh helpful. 
+My partner Kevin Chang contributed mostly to finding more about the data cache, while I contributed by reverse engineering specifications about the instruction cache.
+
+\end{document}
