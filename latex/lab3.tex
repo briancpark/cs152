@@ -20,9 +20,45 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section*{(Directed) Problem 3.3: Performance Bottlenecks}
 
-dhrystone median multiply qsort spmv towers vvadd
 
- 
+
+\begin{table}[ht]
+\caption{CPI for Different Optimizations} % title of Table
+\centering % used for centering table
+\begin{tabular}{c c c c c c c c} % centered columns (4 columns)
+\hline\hline %inserts double horizontal lines
+& dhrystone & median & multiply & qsort & spmv & towers & vvadd \\ [0.5ex] % inserts table
+%heading
+\hline % inserts single horizontal line
+Rocket & 1.200 & 1.379 & 1.136 & 1.427 & 1.690 & 1.029 & 1.024 \\
+BOOM (worst-case) & 6.679 & 5.538 & 7.275 & 5.698 & 6.001 & 6.144 & 6.884 \\
+BOOM (64 PRF) & 6.679 & 5.538 & 7.275 & 5.698 & 6.001 & 6.144 & 6.884 \\
+BOOM (16 ROB) \\
+BOOM (br. pred.) \\
+[1ex] % [1ex] adds vertical space
+\hline %inserts single line
+\end{tabular}
+\label{table:nonlin} % is used to refer this table in the text
+\end{table}
+
+\begin{table}[ht]
+\caption{Branch Prediction Accuracies} % title of Table
+\centering % used for centering table
+\begin{tabular}{c c c c c c c c} % centered columns (4 columns)
+\hline\hline %inserts double horizontal lines
+& dhrystone & median & multiply & qsort & spmv & towers & vvadd \\ [0.5ex] % inserts table
+%heading
+\hline % inserts single horizontal line
+%Rocket & 1.200 & 1.379 & 1.136 & 1.427 & 1.690 & 1.029 & 1.024 \\
+BOOM (worst-case) & 0.589 & 0.570 & 0.904 & 0.611 & 0.476 & 0.827 & 0.766 \\
+BOOM (64 PRF) & 0.589 & 0.570 & 0.904 & 0.611 & 0.476 & 0.827 & 0.766\\
+BOOM (16 ROB) \\
+BOOM (br. pred.) \\
+[1ex] % [1ex] adds vertical space
+\hline %inserts single line
+\end{tabular}
+\label{table:nonlin} % is used to refer this table in the text
+\end{table}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Question 3.3
