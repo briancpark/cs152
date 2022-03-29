@@ -64,7 +64,9 @@ BOOM (br. pred.) & 0.002 & 0.173 & 0.087 & 0.177 & 0.192 & 0.070 & 0.032 \\
 
 \begin{Parts}
 	\Part Compare the results for 1-wide BOOM with the in-order, 5-stage Rocket core. Was out-of-order issue an improvement on the CPI for these benchmarks? Explain the impact of each microarchitectural change. \\
+	Yes, in general, the out of order issue in BOOM was an improvement for each microarchitectural change. There is always some extent of improvement of CPI in all benchmarks and all microarchitectural changes. For just BOOM in the worst case, it exemplifies the best improvement compared to the other microarchitectural changes. The OoO execution definitely helps in exploiting ILP over the Rocket processors, but as more hardware complexity is added, the CPI performance dips down again. We see it dip down the most for increasing the physical register file to 64. This may be due to the increased latency to index the registers. The most minimal performance dip is changing the reorder buffer from 4 to 16. This minimal dip might be because of the increased overhead of holding more entries in the reorder buffer. And for enabling branch prediction, we see another dip in CPI. This dip could be due to more branch mispredicts and the cost it incurs to take the correct branch again. 
 	\Part Is branch prediction with a BTB, BHT, and RAS always a benefit? \\
+	In this case, yes. Branch prediction across all benchmarks provide better prediction accuracies. For even smaller programs though, the costs may outweigh the benefits, where the program will not have enough time to be trained on the program's branch pattern. Also, since hardware complexity is added, it may increase the space used on the chip dye, affecting engineering costs.
 \end{Parts}
 \newpage
 
