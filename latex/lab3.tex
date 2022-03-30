@@ -33,8 +33,8 @@
 Rocket & 1.200 & 1.379 & 1.136 & 1.427 & 1.690 & 1.029 & 1.024 \\
 BOOM (worst-case) & 6.679 & 5.538 & 7.275 & 5.698 & 6.001 & 6.144 & 6.884 \\
 BOOM (64 PRF) & 2.891 & 3.674 & 3.743 & 3.126 & 2.627 & 2.197 & 2.779 \\
-BOOM (16 ROB) & 6.671 & 5.446 & 7.275 & 5.698 & 5.906 & 6.103 & 6.884 \\
-BOOM (br. pred.) & 5.886 & 4.8561 & 6.568 & 5.510 & 5.905 & 5.876 & 6.503 \\
+BOOM (16 ROB) & 2.300 & 3.372 & 3.628 & 2.651 & 1.586 & 1.423 & 2.284 \\
+BOOM (br. pred.) & 1.071 & 1.880 & 1.238 & 2.017 & 1.429 & 1.026 & 1.038 \\
 [1ex] % [1ex] adds vertical space
 \hline %inserts single line
 \end{tabular}
@@ -53,7 +53,7 @@ BOOM (br. pred.) & 5.886 & 4.8561 & 6.568 & 5.510 & 5.905 & 5.876 & 6.503 \\
 BOOM (worst-case) & 0.589 & 0.570 & 0.904 & 0.611 & 0.476 & 0.827 & 0.766 \\
 BOOM (64 PRF) & 0.589 & 0.570 & 0.904 & 0.611 & 0.476 & 0.827 & 0.766 \\
 BOOM (16 ROB) & 0.589 & 0.570 & 0.904 & 0.611 & 0.476 & 0.827 & 0.766 \\
-BOOM (br. pred.) & 0.002 & 0.173 & 0.087 & 0.177 & 0.192 & 0.070 & 0.032 \\
+BOOM (br. pred.) & 0.002 & 0.153 & 0.084 & 0.177 & 0.173 & 0.048 & 0.022 \\
 [1ex] % [1ex] adds vertical space
 \hline %inserts single line
 \end{tabular}
@@ -64,7 +64,7 @@ BOOM (br. pred.) & 0.002 & 0.173 & 0.087 & 0.177 & 0.192 & 0.070 & 0.032 \\
 
 \begin{Parts}
 	\Part Compare the results for 1-wide BOOM with the in-order, 5-stage Rocket core. Was out-of-order issue an improvement on the CPI for these benchmarks? Explain the impact of each microarchitectural change. \\
-	Yes, in general, the out of order issue in BOOM was an improvement for each microarchitectural change. There is always some extent of improvement of CPI in all benchmarks and all microarchitectural changes. For just BOOM in the worst case, it exemplifies the best improvement compared to the other microarchitectural changes. The OoO execution definitely helps in exploiting ILP over the Rocket processors, but as more hardware complexity is added, the CPI performance dips down again. We see it dip down the most for increasing the physical register file to 64. This may be due to the increased latency to index the registers. The most minimal performance dip is changing the reorder buffer from 4 to 16. This minimal dip might be because of the increased overhead of holding more entries in the reorder buffer. And for enabling branch prediction, we see another dip in CPI. This dip could be due to more branch mispredicts and the cost it incurs to take the correct branch again. 
+
 	\Part Is branch prediction with a BTB, BHT, and RAS always a benefit? \\
 	In this case, yes. Branch prediction across all benchmarks provide better prediction accuracies. For even smaller programs though, the costs may outweigh the benefits, where the program will not have enough time to be trained on the program's branch pattern. Also, since hardware complexity is added, it may increase the space used on the chip dye, affecting engineering costs.
 \end{Parts}
