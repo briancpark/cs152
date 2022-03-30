@@ -20,8 +20,6 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section*{(Directed) Problem 3.3: Performance Bottlenecks}
 
-
-
 \begin{table}[ht]
 \caption{CPI for Different Optimizations} % title of Table
 \centering % used for centering table
@@ -60,8 +58,6 @@ BOOM (br. pred.) & 0.002 & 0.153 & 0.084 & 0.177 & 0.173 & 0.048 & 0.022 \\
 \label{table:nonlin} % is used to refer this table in the text
 \end{table}
 
-
-
 \begin{Parts}
 	\Part Compare the results for 1-wide BOOM with the in-order, 5-stage Rocket core. Was out-of-order issue an improvement on the CPI for these benchmarks? Explain the impact of each microarchitectural change. \\
 	Yes, the out of order issue was an improvement on the CPI for each of these benchmarks as we added more optimizations. In the end, 3 out of 7 benchmarks performed better than the Rocket core. The final iteration of improvements that end in branch prediction shows CPI being near par on with Rocket core or being slightly better. Each microarchitectural always performed better than the previous iteration. Increasing the physical register file gave the most drastic improvement, increasing reorder buffer game minimal boost in performance, and turning on branch prediction gave another boost in performance that makes is nearly as good as the Rocket core. Increasing the physical register file might've given the largest boost in performance as there are less register spilling happening with more registers, thus less expensive accesses to memory.
@@ -75,6 +71,37 @@ BOOM (br. pred.) & 0.002 & 0.153 & 0.084 & 0.177 & 0.173 & 0.048 & 0.022 \\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section*{(Open-ended) Problem 4.1: Designing Your Own Branch Predictor}
 
+\begin{table}[ht]
+\caption{IPC} % title of Table
+\centering % used for centering table
+\begin{tabular}{c c c c c c c c} % centered columns (4 columns)
+\hline\hline %inserts double horizontal lines
+& dhrystone & median & multiply & qsort & spmv & towers & vvadd \\ [0.5ex] % inserts table
+%heading
+\hline % inserts single horizontal line
+BOOM (base configuration) & 1.045 & 0.428 & 0.874 & 0.543 & 0.954 & 1.288 & 1.476 \\
+BOOM (custom branch prediction) \\
+[1ex] % [1ex] adds vertical space
+\hline %inserts single line
+\end{tabular}
+\label{table:nonlin} % is used to refer this table in the text
+\end{table}
+
+\begin{table}[ht]
+\caption{Branch Misprediction Accuracies} % title of Table
+\centering % used for centering table
+\begin{tabular}{c c c c c c c c} % centered columns (4 columns)
+\hline\hline %inserts double horizontal lines
+& dhrystone & median & multiply & qsort & spmv & towers & vvadd \\ [0.5ex] % inserts table
+%heading
+\hline % inserts single horizontal line
+BOOM (base configuration) & 0.031 & 0.222 & 0.106 & 0.179 & 0.225 & 0.120 & 0.047 \\
+BOOM (custom branch prediction) \\
+[1ex] % [1ex] adds vertical space
+\hline %inserts single line
+\end{tabular}
+\label{table:nonlin} % is used to refer this table in the text
+\end{table}
 \newpage
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
