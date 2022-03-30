@@ -64,7 +64,7 @@ BOOM (br. pred.) & 0.002 & 0.153 & 0.084 & 0.177 & 0.173 & 0.048 & 0.022 \\
 
 \begin{Parts}
 	\Part Compare the results for 1-wide BOOM with the in-order, 5-stage Rocket core. Was out-of-order issue an improvement on the CPI for these benchmarks? Explain the impact of each microarchitectural change. \\
-
+	Yes, the out of order issue was an improvement on the CPI for each of these benchmarks as we added more optimizations. In the end, 3 out of 7 benchmarks performed better than the Rocket core. The final iteration of improvements that end in branch prediction shows CPI being near par on with Rocket core or being slightly better. Each microarchitectural always performed better than the previous iteration. Increasing the physical register file gave the most drastic improvement, increasing reorder buffer game minimal boost in performance, and turning on branch prediction gave another boost in performance that makes is nearly as good as the Rocket core. Increasing the physical register file might've given the largest boost in performance as there are less register spilling happening with more registers, thus less expensive accesses to memory.
 	\Part Is branch prediction with a BTB, BHT, and RAS always a benefit? \\
 	In this case, yes. Branch prediction across all benchmarks provide better prediction accuracies. For even smaller programs though, the costs may outweigh the benefits, where the program will not have enough time to be trained on the program's branch pattern. Also, since hardware complexity is added, it may increase the space used on the chip dye, affecting engineering costs.
 \end{Parts}
@@ -74,7 +74,7 @@ BOOM (br. pred.) & 0.002 & 0.153 & 0.084 & 0.177 & 0.173 & 0.048 & 0.022 \\
 % Question 4
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section*{(Open-ended) Problem 4.1: Designing Your Own Branch Predictor}
-\section*{(Open-ended) Problem 4.2: Recreating Spectre Attacks}
+
 \newpage
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
