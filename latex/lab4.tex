@@ -1,0 +1,171 @@
+\documentclass[11pt]{article}
+\usepackage{cs152}
+
+%%%%%%%%%%%%%%%%%%%% name/id
+\rfoot{\small Brian Park | 3033045069}
+
+
+%%%%%%%%%%%%%%%%%%%% Course/HW info
+\newcommand*{\instr}{John Wawrzynek}
+\newcommand*{\term}{Spring 2022}
+\newcommand*{\coursenum}{CS 152}
+\newcommand*{\coursename}{Computer Architecture and Engineering}
+\newcommand*{\hwnum}{4}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Document Start %%%%%%%%%%%%%%%%%
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Question 3
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{(Directed) Problem 3.3: Performance Bottlenecks}
+
+\begin{table}[ht]
+\caption{CPI for Different Optimizations} % title of Table
+\centering % used for centering table
+\begin{tabular}{c c c c c c c c} % centered columns (4 columns)
+\hline\hline %inserts double horizontal lines
+& dhrystone & median & multiply & qsort & spmv & towers & vvadd \\ [0.5ex] % inserts table
+%heading
+\hline % inserts single horizontal line
+Rocket & 1.200 & 1.379 & 1.136 & 1.427 & 1.690 & 1.029 & 1.024 \\
+BOOM (worst-case) & 6.679 & 5.538 & 7.275 & 5.698 & 6.001 & 6.144 & 6.884 \\
+BOOM (64 PRF) & 2.891 & 3.674 & 3.743 & 3.126 & 2.627 & 2.197 & 2.779 \\
+BOOM (16 ROB) & 2.300 & 3.372 & 3.628 & 2.651 & 1.586 & 1.423 & 2.284 \\
+BOOM (br. pred.) & 1.071 & 1.880 & 1.238 & 2.017 & 1.429 & 1.026 & 1.038 \\
+[1ex] % [1ex] adds vertical space
+\hline %inserts single line
+\end{tabular}
+\label{table:nonlin} % is used to refer this table in the text
+\end{table}
+
+\begin{table}[ht]
+\caption{Branch Misprediction Accuracies} % title of Table
+\centering % used for centering table
+\begin{tabular}{c c c c c c c c} % centered columns (4 columns)
+\hline\hline %inserts double horizontal lines
+& dhrystone & median & multiply & qsort & spmv & towers & vvadd \\ [0.5ex] % inserts table
+%heading
+\hline % inserts single horizontal line
+%Rocket & 1.200 & 1.379 & 1.136 & 1.427 & 1.690 & 1.029 & 1.024 \\
+BOOM (worst-case) & 0.589 & 0.570 & 0.904 & 0.611 & 0.476 & 0.827 & 0.766 \\
+BOOM (64 PRF) & 0.589 & 0.570 & 0.904 & 0.611 & 0.476 & 0.827 & 0.766 \\
+BOOM (16 ROB) & 0.589 & 0.570 & 0.904 & 0.611 & 0.476 & 0.827 & 0.766 \\
+BOOM (br. pred.) & 0.002 & 0.153 & 0.084 & 0.177 & 0.173 & 0.048 & 0.022 \\
+[1ex] % [1ex] adds vertical space
+\hline %inserts single line
+\end{tabular}
+\label{table:nonlin} % is used to refer this table in the text
+\end{table}
+
+\begin{Parts}
+	\Part Compare the results for 1-wide BOOM with the in-order, 5-stage Rocket core. Was out-of-order issue an improvement on the CPI for these benchmarks? Explain the impact of each microarchitectural change. \\
+	Yes, the out of order issue was an improvement on the CPI for each of these benchmarks as we added more optimizations. In the end, 3 out of 7 benchmarks performed better than the Rocket core. The final iteration of improvements that end in branch prediction shows CPI being near par on with Rocket core or being slightly better. Each microarchitectural always performed better than the previous iteration. Increasing the physical register file gave the most drastic improvement, increasing reorder buffer game minimal boost in performance, and turning on branch prediction gave another boost in performance that makes is nearly as good as the Rocket core. Increasing the physical register file might've given the largest boost in performance as there are less register spilling happening with more registers, thus less expensive accesses to memory.
+	\Part Is branch prediction with a BTB, BHT, and RAS always a benefit? \\
+	In this case, yes. Branch prediction across all benchmarks provide better prediction accuracies. For even smaller programs though, the costs may outweigh the benefits, where the program will not have enough time to be trained on the program's branch pattern. Also, since hardware complexity is added, it may increase the space used on the chip dye, affecting engineering costs.
+\end{Parts}
+\newpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Question 4
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{(Open-ended) Problem 4.1: Designing Your Own Branch Predictor}
+My partner for this lab was Kevin Chang. This copy of the lab is the main copy, please use this to grade. \\ \\
+We first of began by reading how to combine multiple branch predictors from McFarling. \cite{McFarling1993CombiningBP} But after beginning development, we realized that it took too long to try to implement a global and local predictor combined with a arbiter predictor. To debug and simulate all of these would take a lot of time. To save on time and have our code be simplistic, we stuck with just optimizing the local predictor. We read the Alpha 21264 microprocessor's branch prediction implementation and followed the design patterns of its local predictor. \cite{755465} We realized that the starter code doesn't utilize the history of the branches, so we used \verb|hist| to our advantage and some bitwise manipulation to access and predict a value if the branch will be taken or not, as well as using 10-bit branch patterns indexed by PC, which is then used to index a set of 3-bit counters as mentioned in the Alpha microprocessor branch prediction design. \cite{755465} But we later found out through tuning that looking at the past 4 branch patterns was optimal, at least for the Dhyrstone benchmark. Increasing it more gave diminishing returns. 
+
+
+We calculated the amount of state that our branch predictor has via print statements and trying to estimate and detect patterns. But, in the end we used the default 1024 that Kessler's design suggests. \cite{755465}. We found that increasing or decreasing the state has negligible effect when decreased to 512 or 2048, meaning that maybe the benchmarks do not stress the branch predictor state as much and it could be smaller. Having the state larger and implementing it in hardware would only add more complexity and latency. In a software branch predictor, it could lead to more CPI and higher algorithmic runtime complexity. Other parameters that we found that affected the accuracy was the number of history entries to look at, which is explained later below. 
+
+In the next page lies the source code of our branch prediction in \verb|predictor_sw.cc|.
+\newpage
+\lstset{language=c}
+\begin{lstlisting}
+#define BIMODAL_TABLE_SIZE 1024
+#define BIMODAL_HISTORY_BITS 4
+#define MAX_COUNTER 3
+
+#include <stdint.h>
+#include <stdio.h>
+
+int bimodal_table[BIMODAL_TABLE_SIZE];
+
+extern "C" void initialize_branch_predictor() {
+    for (int i = 0; i < BIMODAL_TABLE_SIZE; i++)
+        bimodal_table[i] = 0;
+}
+
+extern "C" void predict_branch(unsigned long long ip, unsigned long long hist, unsigned char *pred)
+{
+    uint32_t hash = ip % BIMODAL_TABLE_SIZE & 31;
+    uint32_t update = hash >> BIMODAL_HISTORY_BITS;
+    update = ((update ^ hist) % 32) << BIMODAL_HISTORY_BITS;
+    hash = ((hash & 31) | update) % BIMODAL_TABLE_SIZE;
+
+    *pred = (bimodal_table[hash] >= ((MAX_COUNTER + 1)/2)) ? 1 : 0;
+}
+
+extern "C" void update_branch(unsigned long long ip, unsigned long long hist, unsigned char taken){
+    uint32_t hash = ip % BIMODAL_TABLE_SIZE;
+    uint32_t update = hash >> BIMODAL_HISTORY_BITS;
+    update = ((update ^ hist) % 32) << BIMODAL_HISTORY_BITS;
+    hash = ((hash & 31) | update) % BIMODAL_TABLE_SIZE;
+
+    if (taken && (bimodal_table[hash] < MAX_COUNTER))
+        bimodal_table[hash]++;
+    else if ((taken == 0) && (bimodal_table[hash] > 0))
+        bimodal_table[hash]--;
+}
+\end{lstlisting}
+\newpage
+
+Considering that this is relatively terse, this is best we think we could do given the amount of time we wanted to spend. Adding too much algorithmic complexity could lead to higher CPI/lower IPC. To save on time, we only benchmarked on Dhrystone when debugging performance, but later on realized that optimizing over one benchmark does not necessarily transfer to other benchmarks due to the nature of the code and instruction stream. For example, we will see an even worse performance on quicksort benchmark, and there is really nothing that can be done about that since sorting takes unpredictable branch patterns due to the nature of the random input. Because Dhrystone seems to be a static benchmark (data doesn't change between runs), we think that is the reason why our branch prediction shows the best improvement. There is only slight improvements over mathematically intense benchmarks such as multiply, median, and sparse matrix-vector multiply. If given more time, we would've went beyond and implemented the global and arbiter predictors. Our branch predictor could potentially perform better on repetitive instruction streams such as Dhrystone. But it would perform poorly on random branches such as sorting. We are not sure why vvadd performs worse than the base configuration and think it's minor as the difference is minimal. 
+
+Below is our report of the IPC and branch misprediction accuracies compared to the baseline config starter code and our own custom branch prediction code. 
+
+\begin{table}[ht]
+\caption{IPC} % title of Table
+\centering % used for centering table
+\begin{tabular}{c c c c c c c c} % centered columns (4 columns)
+\hline\hline %inserts double horizontal lines
+& dhrystone & median & multiply & qsort & spmv & towers & vvadd \\ [0.5ex] % inserts table
+%heading
+\hline % inserts single horizontal line
+BOOM (base configuration) & 1.045 & 0.428 & 0.874 & 0.543 & 0.954 & 1.288 & 1.476 \\
+BOOM (custom branch prediction) & 1.126 & 0.493 & 0.894 & 0.499 & 0.973 & 1.481 & 1.436\\
+[1ex] % [1ex] adds vertical space
+\hline %inserts single line
+\end{tabular}
+\label{table:nonlin} % is used to refer this table in the text
+\end{table}
+
+\begin{table}[ht]
+\caption{Branch Misprediction Accuracies} % title of Table
+\centering % used for centering table
+\begin{tabular}{c c c c c c c c} % centered columns (4 columns)
+\hline\hline %inserts double horizontal lines
+& dhrystone & median & multiply & qsort & spmv & towers & vvadd \\ [0.5ex] % inserts table
+%heading
+\hline % inserts single horizontal line
+BOOM (base configuration) & 0.031 & 0.222 & 0.106 & 0.179 & 0.225 & 0.120 & 0.047 \\
+BOOM (custom branch prediction) & 0.019 & 0.191 & 0.101 & 0.216 & 0.201 & 0.118 & 0.069 \\
+[1ex] % [1ex] adds vertical space
+\hline %inserts single line
+\end{tabular}
+\label{table:nonlin} % is used to refer this table in the text
+\end{table}
+\newpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Question 5
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{(Directed) Problem 5: Feedback}
+We spent around 12 hours on this lab. A lot of it was waiting for benchmarks to run and finalize. Development took really long for the open ended part, as running simulations took several minutes. So it was really hard to quickly debug and try new things. What disliked about this lab is how slow it is to run the benchmarks. I couldn't do any other stuff while waiting, as it would just take too long for me to context switch into how to debug the branch prediction performance while doing other work simultaneously. What I liked most about the lab was actually making something cool and exploring performance through branch prediction accuracies. It felt like a Kaggle competition or machine learning model hyperparameter tuning, where I had to optimize code for not only performance in CPI, but also branch prediction accuracies. There is nothing that I think needs to be changed about this lab, other than the time factor.
+
+For the open ended portion, if there was more time given or a faster way to run the simulations, I would've explored more deeply. For this lab, it would be cool if you could deploy your branch prediction code and see it work in action on actual RISC-V hardware. For me personally, I'm interested in accelerating machine learning, so I'd be interested in how well my branch prediction performs in algorithms like decision trees. I'd also be interested in exploring deeper of the reverse, using some form of decision trees in branch prediction. Interestingly, something like this has been done with perceptrons as mentioned in the Apple guest lecture.
+
+For contribution, I mostly contributed to the lab. My partner Kevin Chang helped me with running some benchmarks and the writeup, as he was occupied with EECS 151. 
+
+\bibliographystyle{ieeetr}
+\bibliography{references} 
+
+\end{document}
