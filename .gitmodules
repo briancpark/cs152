@@ -7,3 +7,9 @@
 [submodule "labs/lab3"]
 	path = labs/lab3
 	url = git@github.com:briancpark/cs152-lab3.git
+[submodule "labs/lab4"]
+	path = labs/lab4
+	url = git@github.com:briancpark/cs152-lab4.git
+[submodule "labs/lab5"]
+	path = labs/lab5
+	url = git@github.com:briancpark/cs152-lab5.git
