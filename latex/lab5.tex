@@ -10,7 +10,7 @@
 \newcommand*{\term}{Spring 2022}
 \newcommand*{\coursenum}{CS 152}
 \newcommand*{\coursename}{Computer Architecture and Engineering}
-\newcommand*{\hwnum}{4}
+\newcommand*{\hwnum}{5}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Document Start %%%%%%%%%%%%%%%%%
 \begin{document}
@@ -19,22 +19,30 @@
 % Question 3.3
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section*{(Directed) Problem 3.3: Naive \texttt{vvadd} results for MSI}
-
+With the MSI coherence protocol, this is the log of the multithreaded vector-vector add naive code:
+\begin{verbatim}
+vvadd_naive: 48710 cycles, 48.7 cycles/iter, 9.6 CPI
+\end{verbatim}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Question 3.4
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section*{(Directed) Problem 3.4: Naive \texttt{vvadd} results for MI and analysis}
-
+With the MI coherence protocol, this is the log of the multithreaded vector-vector add naive code:
+\begin{verbatim}
+vvadd_naive: 53427 cycles, 53.4 cycles/iter, 10.6 CPI
+\end{verbatim}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Question 3.5
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section*{(Directed) Problem 3.5: Optimized \texttt{vvadd} code, results, and analysis}
 
+\newpage
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Question 4
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section*{(Open-ended) Problem 4: Optimized \texttt{matmul} code, results, and analysis}
 
+\newpage
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Question 5
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
