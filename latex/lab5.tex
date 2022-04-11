@@ -23,6 +23,7 @@ With the MSI coherence protocol, this is the log of the multithreaded vector-vec
 \begin{verbatim}
 vvadd_naive: 48710 cycles, 48.7 cycles/iter, 9.6 CPI
 \end{verbatim}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Question 3.4
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -30,8 +31,10 @@ vvadd_naive: 48710 cycles, 48.7 cycles/iter, 9.6 CPI
 With the MI coherence protocol, this is the log of the multithreaded vector-vector add naive code:
 \begin{verbatim}
 vvadd_naive: 53427 cycles, 53.4 cycles/iter, 10.6 CPI
-We see that MI performs even worse than the MSI protocol. In theory, it makes sense why MSI performs better than MI because of the additional share state that reduces false sharing. But in general, the naive code is written poorly where it has no locality of cache. Each core interleaves memory accesses, causing cache lines to be shared. We will discuss how to improve this in 3.5.
 \end{verbatim}
+
+We see that MI performs even worse than the MSI protocol. In theory, it makes sense why MSI performs better than MI because of the additional share state that reduces false sharing. But in general, the naive code is written poorly where it has no locality of cache. Each core interleaves memory accesses, causing cache lines to be shared. We will discuss how to improve this in 3.5.
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Question 3.5
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -49,8 +52,8 @@ vvadd_opt: 24321 cycles, 24.3 cycles/iter, 6.0 CPI
 \end{verbatim}
 
 To achieve much better cycles per iteration, I made it so that each core computes on one continuous chunk of the array. That way, it can optimize on its L1 cache performance as well as maintain cache coherency.
-
 \newpage
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Question 4
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
