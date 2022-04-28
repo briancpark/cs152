@@ -76,15 +76,15 @@ Below lies the result with the optimizations applied.
 
 With MI:
 \begin{verbatim}
-matmul_opt: 610215 cycles, 18.6 cycles/iter, 5.6 CPI
+matmul_opt: 251084 cycles, 7.6 cycles/iter, 3.9 CPI
 \end{verbatim} 
 
 With MSI:
 \begin{verbatim}
-matmul_opt: 231419 cycles, 7.0 cycles/iter, 2.1 CPI
+matmul_opt: 184597 cycles, 5.6 cycles/iter, 2.8 CPI
 \end{verbatim}
 
-The optimizations are pretty standard techniques learnt from another course. First optimization I did was cache blocking to optimize over the 4MiB L1 cache size. The block size chosen was 16, and that was based on hyperparameter tuning. Next optimization is loop unrolling or register blocking. I chose to unroll the loop 4 times in the inner most multiply add loop. We know that there are 32 floating point registers, so unrolling more could lead to register spilling, since there might be other registers used by the OS to context switch the state of registers in the thread control block or process control block. Loop reordering was also achieved to get the most optimal cache traversal, so the $j$ and $k$ loop was put in the inner most loop to do so. Having $i$ loop in the outermost loop is the most optimal, as $i$ will step over large strides, missing cache lines. 
+The optimizations are pretty standard techniques learnt from another course. First optimization I did was cache blocking to optimize over the 4MiB L1 cache size. The block size chosen was 8, and that was based on hyperparameter tuning. Next optimization is loop unrolling or register blocking. I chose to unroll the loop 8 times in the inner most multiply add loop. Loop reordering was also achieved to get the most optimal cache traversal, so the $j$ and $k$ loop was put in the inner most loop to do so. Having $i$ loop in the outermost loop is the most optimal, as $i$ will step over large strides, optimizing cache locality when also doing multithreading.
 
 \newpage
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -93,6 +93,6 @@ The optimizations are pretty standard techniques learnt from another course. Fir
 \section*{(Directed) Problem 5: Feedback}
 I spend around 1 hour in total finishing this lab. I was able to speedrun this as I am very experienced with performance/parallel programming. Accelerating BLAS routines is what I've been doing in CS 267, so that class was able to help me work quickly. The rest of the time was spent on waiting on simulations. I didn't dislike anything about this lab. The most I liked about this lab was putting my skills of parallel programming into use towards a different ISA. Although I had to code in C, it's still fun to see the disassembly into RISC-V. What I wish to see is a way to run this on RISC-V silicon. The joy of programming these performant programs is to see them speed up on actual hardware via benchmarks and FLOPS. When the hardware becomes available, it would be a nice idea to run these programs on actual RISC-V CPUs and with RISC-V vector extensions enabled. I would love to see how fast you can get with DGEMM, as well as how much energy you could potentially save compared to x86 processors! Something else I wanted to explore is how to deal with floating point numbers, as accuracy is often important and ordering your floating point operations wrong could lead to instability or overflow. I was especially curious in how SIMD or a floating point ALU/FPU works. 
 
-For teamwork, I did all of this lab. I let my partner explore other solutions on his end, but since this was a cake walk for me, I had a solution ready for us early on.
+For teamwork, I did all of this lab since it was something I was more familiar with. I let my partner explore other solutions on his end.
 
 \end{document}
