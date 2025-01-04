@@ -41,7 +41,7 @@ We see that MI performs even worse than the MSI protocol. In theory, it makes se
 \section*{(Directed) Problem 3.5: Optimized \texttt{vvadd} code, results, and analysis}
 These are my results of the optimized \verb|vvadd|:
 
-With MSI: 
+With MSI:
 \begin{verbatim}
 vvadd_opt: 24412 cycles, 24.4 cycles/iter, 6.0 CPI
 \end{verbatim}
@@ -65,19 +65,19 @@ Here is the baseline performance of \verb|mt-matmul-naive|:
 With MI:
 \begin{verbatim}
 matmul_naive: 2065570 cycles, 63.0 cycles/iter, 17.1 CPI
-\end{verbatim} 
+\end{verbatim}
 
 With MSI:
 \begin{verbatim}
 matmul_naive: 542759 cycles, 16.5 cycles/iter, 4.5 CPI
-\end{verbatim} 
+\end{verbatim}
 
-Below lies the result with the optimizations applied. 
+Below lies the result with the optimizations applied.
 
 With MI:
 \begin{verbatim}
 matmul_opt: 251084 cycles, 7.6 cycles/iter, 3.9 CPI
-\end{verbatim} 
+\end{verbatim}
 
 With MSI:
 \begin{verbatim}
@@ -91,7 +91,7 @@ The optimizations are pretty standard techniques learnt from another course. Fir
 % Question 5
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section*{(Directed) Problem 5: Feedback}
-I spend around 1 hour in total finishing this lab. I was able to speedrun this as I am very experienced with performance/parallel programming. Accelerating BLAS routines is what I've been doing in CS 267, so that class was able to help me work quickly. The rest of the time was spent on waiting on simulations. I didn't dislike anything about this lab. The most I liked about this lab was putting my skills of parallel programming into use towards a different ISA. Although I had to code in C, it's still fun to see the disassembly into RISC-V. What I wish to see is a way to run this on RISC-V silicon. The joy of programming these performant programs is to see them speed up on actual hardware via benchmarks and FLOPS. When the hardware becomes available, it would be a nice idea to run these programs on actual RISC-V CPUs and with RISC-V vector extensions enabled. I would love to see how fast you can get with DGEMM, as well as how much energy you could potentially save compared to x86 processors! Something else I wanted to explore is how to deal with floating point numbers, as accuracy is often important and ordering your floating point operations wrong could lead to instability or overflow. I was especially curious in how SIMD or a floating point ALU/FPU works. 
+I spend around 1 hour in total finishing this lab. I was able to speedrun this as I am very experienced with performance/parallel programming. Accelerating BLAS routines is what I've been doing in CS 267, so that class was able to help me work quickly. The rest of the time was spent on waiting on simulations. I didn't dislike anything about this lab. The most I liked about this lab was putting my skills of parallel programming into use towards a different ISA. Although I had to code in C, it's still fun to see the disassembly into RISC-V. What I wish to see is a way to run this on RISC-V silicon. The joy of programming these performant programs is to see them speed up on actual hardware via benchmarks and FLOPS. When the hardware becomes available, it would be a nice idea to run these programs on actual RISC-V CPUs and with RISC-V vector extensions enabled. I would love to see how fast you can get with DGEMM, as well as how much energy you could potentially save compared to x86 processors! Something else I wanted to explore is how to deal with floating point numbers, as accuracy is often important and ordering your floating point operations wrong could lead to instability or overflow. I was especially curious in how SIMD or a floating point ALU/FPU works.
 
 For teamwork, I did all of this lab since it was something I was more familiar with. I let my partner explore other solutions on his end.
 
