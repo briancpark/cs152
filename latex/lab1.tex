@@ -20,7 +20,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section*{(Directed) Problem 3.4}
 
-\centerline{\includegraphics[width=7in]{../labs/lab1/figures/3_4.png}}
+\centerline{\includegraphics[width=7in]{figures/3_4.png}}
 
 The benchmark that has the highest arithmetic intensity is multiply, which makes sense as a lot of arithmetic operations would be happening. The benchmark that seems to be the most memory bound is the Hanoi towers benchmark. This makes sense if the algorithm used is the recursive algorithm, causing a lot of stack frame allocation. Benchmark that seems dependent on branch prediction performance is median. This makes sense as you would have a lot of control statements dependent on sorting. The quicksort benchmark also shows similar intensities per instruction due to this.
 
@@ -31,56 +31,56 @@ The benchmark that has the highest arithmetic intensity is multiply, which makes
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section*{(Directed) Problem 3.5}
 
-\centerline{\includegraphics[width=7in]{../labs/lab1/figures/3_5_1.png}}
+\centerline{\includegraphics[width=7in]{figures/3_5_1.png}}
 
 The overall CPI of the machine for each benchmark is as follows:
 
 \begin{table}[ht]
-\caption{New CPI for Benchmarks} % title of Table
-\centering % used for centering table
-\begin{tabular}{c c} % centered columns (4 columns)
-\hline\hline %inserts double horizontal lines
-Benchmark & CPI\#1 \\ [0.5ex] % inserts table
-%heading
-\hline % inserts single horizontal line
-dhrystone & 1.475 \\
-median & 1.501 \\
-multiply & 1.209 \\
-qsort & 1.465 \\
-rsort & 1.376 \\
-towers & 1.502 \\
-vvadd & 1.423 \\
-[1ex] % [1ex] adds vertical space
-\hline %inserts single line
-\end{tabular}
-\label{table:nonlin} % is used to refer this table in the text
+	\caption{New CPI for Benchmarks} % title of Table
+	\centering % used for centering table
+	\begin{tabular}{c c} % centered columns (4 columns)
+		\hline\hline %inserts double horizontal lines
+		Benchmark & CPI\#1 \\ [0.5ex] % inserts table
+		%heading
+		\hline % inserts single horizontal line
+		dhrystone & 1.475  \\
+		median    & 1.501  \\
+		multiply  & 1.209  \\
+		qsort     & 1.465  \\
+		rsort     & 1.376  \\
+		towers    & 1.502  \\
+		vvadd     & 1.423  \\
+		[1ex] % [1ex] adds vertical space
+		\hline %inserts single line
+	\end{tabular}
+	\label{table:nonlin} % is used to refer this table in the text
 \end{table}
 
-\centerline{\includegraphics[width=7in]{../labs/lab1/figures/3_5_2.png}}
+\centerline{\includegraphics[width=7in]{figures/3_5_2.png}}
 
 For the case that loads and stores are sped up to have an average CPI of 1, then the new CPIs are as follows:
 \begin{table}[ht]
-\caption{New CPI for Benchmarks} % title of Table
-\centering % used for centering table
-\begin{tabular}{c c} % centered columns (4 columns)
-\hline\hline %inserts double horizontal lines
-Benchmark & CPI\#1 \\ [0.5ex] % inserts table
-%heading
-\hline % inserts single horizontal line
-dhrystone & 1.121 \\
-median & 1.18 \\
-multiply & 1.16 \\
-qsort & 1.151 \\
-rsort & 1.028 \\
-towers & 1.08 \\
-vvadd & 1.118 \\
-[1ex] % [1ex] adds vertical space
-\hline %inserts single line
-\end{tabular}
-\label{table:nonlin} % is used to refer this table in the text
+	\caption{New CPI for Benchmarks} % title of Table
+	\centering % used for centering table
+	\begin{tabular}{c c} % centered columns (4 columns)
+		\hline\hline %inserts double horizontal lines
+		Benchmark & CPI\#1 \\ [0.5ex] % inserts table
+		%heading
+		\hline % inserts single horizontal line
+		dhrystone & 1.121  \\
+		median    & 1.18   \\
+		multiply  & 1.16   \\
+		qsort     & 1.151  \\
+		rsort     & 1.028  \\
+		towers    & 1.08   \\
+		vvadd     & 1.118  \\
+		[1ex] % [1ex] adds vertical space
+		\hline %inserts single line
+	\end{tabular}
+	\label{table:nonlin} % is used to refer this table in the text
 \end{table}
 
-\centerline{\includegraphics[width=7in]{../labs/lab1/figures/3_5_3.png}}
+\centerline{\includegraphics[width=7in]{figures/3_5_3.png}}
 
 The plot above shows the comparison of CPIs between the originally given problem prompt and the one optimized with loads and stores. We see that this is an improvements for benchmarks like dhrystone, rsort, and towers. Unfortunately, there is not much of an improvement else where. For just a small speedup, it's not that worthwhile for all the benchmarks. Because there is not one dominating category of instructions for each of the benchmark, the modifications get diluted down in terms of total CPI.
 
@@ -91,46 +91,45 @@ The plot above shows the comparison of CPIs between the originally given problem
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section*{(Directed) Problem 3.6}
 
-\centerline{\includegraphics[width=7in]{../labs/lab1/figures/3_6.png}}
+\centerline{\includegraphics[width=7in]{figures/3_6.png}}
 
-According to figure, disabling bypassing increases the CPI in all benchmarks. Quantitatively that's nearly 2.3x worse for rsort. The least it has affected is multiply with a 1.2x increase in CPI. 
+According to figure, disabling bypassing increases the CPI in all benchmarks. Quantitatively that's nearly 2.3x worse for rsort. The least it has affected is multiply with a 1.2x increase in CPI.
 
 \begin{table}[ht]
-\caption{New CPI for Benchmarks} % title of Table
-\centering % used for centering table
-\begin{tabular}{c c c c} % centered columns (4 columns)
-\hline\hline %inserts double horizontal lines
-Benchmark & CPI w/ Bypassing & CPI w/ Interlocking & Ratio\\ [0.5ex] % inserts table
-%heading
-\hline % inserts single horizontal line
-dhrystone & 1.323 & 1.986 & 1.501 \\
-median & 1.469 & 1.888 & 1.285 \\
-multiply & 1.565 & 1.911 & 1.221 \\
-qsort & 1.421 & 1.935 & 1.362 \\
-rsort & 1.083 & 2.323 & 2.145 \\
-towers & 1.25 & 1.673 & 1.338 \\
-vvadd & 1.351 & 1.839 & 1.361 \\
-[1ex] % [1ex] adds vertical space
-\hline %inserts single line
-\end{tabular}
-\label{table:nonlin} % is used to refer this table in the text
+	\caption{New CPI for Benchmarks} % title of Table
+	\centering % used for centering table
+	\begin{tabular}{c c c c} % centered columns (4 columns)
+		\hline\hline %inserts double horizontal lines
+		Benchmark & CPI w/ Bypassing & CPI w/ Interlocking & Ratio \\ [0.5ex] % inserts table
+		%heading
+		\hline % inserts single horizontal line
+		dhrystone & 1.323            & 1.986               & 1.501 \\
+		median    & 1.469            & 1.888               & 1.285 \\
+		multiply  & 1.565            & 1.911               & 1.221 \\
+		qsort     & 1.421            & 1.935               & 1.362 \\
+		rsort     & 1.083            & 2.323               & 2.145 \\
+		towers    & 1.25             & 1.673               & 1.338 \\
+		vvadd     & 1.351            & 1.839               & 1.361 \\
+		[1ex] % [1ex] adds vertical space
+		\hline %inserts single line
+	\end{tabular}
+	\label{table:nonlin} % is used to refer this table in the text
 \end{table}
 
-We see that full bypassing performs better than full interlocking. If adding full bypassing would hurt the cycle time of the processor by 25\%, then the cycle time will most likely not be hurt or remain less compared to full interlocking. 
-
+We see that full bypassing performs better than full interlocking. If adding full bypassing would hurt the cycle time of the processor by 25\%, then the cycle time will most likely not be hurt or remain less compared to full interlocking.
 
 \newpage
 \section*{(Directed) Problem 3.7}
 The percentages that the load and store instructions make are displayed below. Interestingly, arithmetic operations are blown up proportionally depending on the number of non-zero offsets for load and stores. For all benchmarks, arithmetic instructions dominate the proportion.
 
-\centerline{\includegraphics[width=7in]{../labs/lab1/figures/3_7_1.png}}
+\centerline{\includegraphics[width=7in]{figures/3_7_1.png}}
 
 We see that although there is a percentage increase of arithmetic instructions, when we look at how many instructions are executed in total is only a small percentage of increase due to the extra arithmetic instruction for fixing the offset before passing the register for memory access.
 
-\centerline{\includegraphics[width=7in]{../labs/lab1/figures/3_7_2.png}}
+\centerline{\includegraphics[width=7in]{figures/3_7_2.png}}
 
 I would advise my employer to adopt this new strategy. The percentage of instruction increase ranges from 1.0214\% to 1.1673\% across all benchmarks. Considering the new design saves on energy and doesn't clog the instruction pipeline due to no need to compute offsets
-between the Execute/Address Calculation and Memory Access stage. Thus, the small percentage increase of instruction, and more utilization of the ALU are not that costly and are good trade-offs. 
+between the Execute/Address Calculation and Memory Access stage. Thus, the small percentage increase of instruction, and more utilization of the ALU are not that costly and are good trade-offs.
 
 \newpage
 
@@ -167,23 +166,23 @@ int main(void) {
 
 
 \begin{table}[ht]
-\caption{Instruction Breakdown} % title of Table
-\centering % used for centering table
-\begin{tabular}{c c} % centered columns (4 columns)
-\hline\hline %inserts double horizontal lines
-Type & Percentage \\ [0.5ex] % inserts table
-%heading
-\hline % inserts single horizontal line
-Arithmetic & 28.705 \\
-Ld/St & 0.028 \\
-Branch/Jump & 71.261 \\
-Branch & 71.099 \\
-Jump & 0.163 \\
-Misc. & 0.006 \\
-[1ex] % [1ex] adds vertical space
-\hline %inserts single line
-\end{tabular}
-\label{table:nonlin} % is used to refer this table in the text
+	\caption{Instruction Breakdown} % title of Table
+	\centering % used for centering table
+	\begin{tabular}{c c} % centered columns (4 columns)
+		\hline\hline %inserts double horizontal lines
+		Type        & Percentage \\ [0.5ex] % inserts table
+		%heading
+		\hline % inserts single horizontal line
+		Arithmetic  & 28.705     \\
+		Ld/St       & 0.028      \\
+		Branch/Jump & 71.261     \\
+		Branch      & 71.099     \\
+		Jump        & 0.163      \\
+		Misc.       & 0.006      \\
+		[1ex] % [1ex] adds vertical space
+		\hline %inserts single line
+	\end{tabular}
+	\label{table:nonlin} % is used to refer this table in the text
 \end{table}
 
 To achieve this high percentage of branch instructions, we had to overcome the optimizations that the compiler imposed, even with \verb|-O0| C flag set, making this percentage difficult to achieve. Trying to lower down the number of arithmetic instructions was challenging, as we wanted to utilize for loops to increase the branching instructions. We also had to modify the \verb|tracer.py| framework to separate the distinction between branches and jumps.
@@ -241,10 +240,10 @@ Utilizing the techniques above gave us this assembly dump:
 \section*{(Directed) Problem 5}
 The directed portion took around 6 hours. Mostly, it was getting setup and running scripts, which was done asynchronously for me while doing other stuff. \\ \\
 The open ended portion took 3 hours. It was a challenge to develop a program that executes a lot of branch instructions while thinking about how the compiler would generate assembly code. \\ \\
-This lab was fun, but I wish there were more coding to do. The directed portion felt like a data analysis section, but it was actually fun analyzing the different benchmarks. The open ended was by far the most fun, because you get exposed to the whole stack from high level C code to low level assembly. I especially had fun working with the RISC-V gnu compiler and seeing how my C code translates to RISC-V, as I've been used to analyzing C code translating to x86. 
+This lab was fun, but I wish there were more coding to do. The directed portion felt like a data analysis section, but it was actually fun analyzing the different benchmarks. The open ended was by far the most fun, because you get exposed to the whole stack from high level C code to low level assembly. I especially had fun working with the RISC-V gnu compiler and seeing how my C code translates to RISC-V, as I've been used to analyzing C code translating to x86.
 I learnt that there are many ways evaluating CPU performance as well as observing and justifying trade-off between certain design decisions. It's very interesting to see the close relationship and connections you can make between an architecture and software, as a developer. \\ \\
 There's nothing in this lab that needs to be changed, I think it was a good first lab. \\ \\
-Contribution was done individually for each directed part. Then we shared work evenly for open ended, each trying different approaches. I went to OH and found some of the input from other classmates and Josh helpful. 
+Contribution was done individually for each directed part. Then we shared work evenly for open ended, each trying different approaches. I went to OH and found some of the input from other classmates and Josh helpful.
 My partner Kevin Chang helped me with knowledge about how compilers worked and gave me ideas on what kind of algorithms or C syntax can exploit branch type instructions. Every member of the team contributed fairly.
 
 \end{document}

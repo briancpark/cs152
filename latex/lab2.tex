@@ -27,13 +27,13 @@
 \subsection*{3.3 Matrix Transposition Case Study}
 \begin{Parts}
 	\Part How many cycles does the transpose operation take? \\
-		The transpose operation takes 1350476 cycles.
+	The transpose operation takes 1350476 cycles.
 	\Part What is the miss rate of the L1 data cache? \\
-		The miss rate of the L1 data cache is $\frac{18661}{16384 + 16407}$. The total number of memory accesses is found by counting the number of loads and stores. Therefore, the miss rate is 56.9\%.
+	The miss rate of the L1 data cache is $\frac{18661}{16384 + 16407}$. The total number of memory accesses is found by counting the number of loads and stores. Therefore, the miss rate is 56.9\%.
 	\Part Why does the naive transpose code result in non-ideal cache performance? \\
-		The code has to transfer data diagonally through the matrix. If the matrix being transposed is fairly large, then a large stride access can hurt cache hits and memory performance. Note that it's really doing a transformation from row major to column major order, so cache performance will definitely take a hit.
+	The code has to transfer data diagonally through the matrix. If the matrix being transposed is fairly large, then a large stride access can hurt cache hits and memory performance. Note that it's really doing a transformation from row major to column major order, so cache performance will definitely take a hit.
 	\Part Which memory access in the code incurs the most misses, and why? \\
-		Obviously, this line of code: \verb|dst[j][i] = src[i][j]| incurs the most misses. Specifically, writing to \verb|dst[j][i]| will incur the most since the CPU will have already loaded \verb|src[i][j]| to a register from memory, but when it wants to write to \verb|dst[j][i]|, it will most likely miss the cache and stall for a memory fetch. Also note that \verb|dst| will be accessed in column major order when the matrix is stored as row major.
+	Obviously, this line of code: \verb|dst[j][i] = src[i][j]| incurs the most misses. Specifically, writing to \verb|dst[j][i]| will incur the most since the CPU will have already loaded \verb|src[i][j]| to a register from memory, but when it wants to write to \verb|dst[j][i]|, it will most likely miss the cache and stall for a memory fetch. Also note that \verb|dst| will be accessed in column major order when the matrix is stored as row major.
 \end{Parts}
 \newpage
 
@@ -80,27 +80,27 @@ void __attribute__ ((noinline)) transpose(mat_nxm_t dst, const mat_mxn_t src)
 	\Part How does performance and miss rate change when associativity is increased? \\
 	When the associativity is increased, the miss rate worsens. The table below shows the relationship between the number of ways in the cache and the miss rate.
 
-\begin{table}[ht]
-\caption{$N$-Way Set Associativity vs. Miss Rate} % title of Table
-\centering % used for centering table
-\begin{tabular}{c c} % centered columns (4 columns)
-\hline\hline %inserts double horizontal lines
-$N$ & Miss Rate \\ [0.5ex] % inserts table
-%heading
-\hline % inserts single horizontal line
-1-way & 21.21\% \\
-2-way & 24.54\% \\
-4-way & 28.05\% \\
-8-way & 31.72\% \\
-[1ex] % [1ex] adds vertical space
-\hline %inserts single line
-\end{tabular}
-\label{table:nonlin} % is used to refer this table in the text
-\end{table}
-	
+	\begin{table}[ht]
+		\caption{$N$-Way Set Associativity vs. Miss Rate} % title of Table
+		\centering % used for centering table
+		\begin{tabular}{c c} % centered columns (4 columns)
+			\hline\hline %inserts double horizontal lines
+			$N$   & Miss Rate \\ [0.5ex] % inserts table
+			%heading
+			\hline % inserts single horizontal line
+			1-way & 21.21\%   \\
+			2-way & 24.54\%   \\
+			4-way & 28.05\%   \\
+			8-way & 31.72\%   \\
+			[1ex] % [1ex] adds vertical space
+			\hline %inserts single line
+		\end{tabular}
+		\label{table:nonlin} % is used to refer this table in the text
+	\end{table}
+
 
 	\Part Explain why higher associativity is or is not beneficial for this particular kernel. \\
-	A higher associativity is not beneficial since transposing takes advantage of spatial locality. With higher associativity, we bring in fewer elements, thus spatial locality is not being taken advantage of. 
+	A higher associativity is not beneficial since transposing takes advantage of spatial locality. With higher associativity, we bring in fewer elements, thus spatial locality is not being taken advantage of.
 \end{Parts}
 \newpage
 
@@ -147,7 +147,7 @@ void __attribute__ ((noinline)) transpose(mat_nxm_t dst, const mat_mxn_t src)
 \section*{(Open-ended) Problem 4.1: Validation and Reverse Engineering of Memory Hierarchies}
 My partner for the open ended portion was with Kevin Chang. His submission includes the main copy, please refer to his submission.
 
-\includepdf[pages=1]{plot-CS152RocketMysteryConfig.pdf}
+\includepdf[pages=1]{figures/plot-CS152RocketMysteryConfig.pdf}
 
 
 We believe the L1 Data Cache is 16kB. We noticed that 4, 8, and 16kB arrays all shared approximately the same cycles per iteration, with a sharp increase after 16kB. In order for this to be the case, their cache hit rates should be almost exactly the same, which is only possible if the cache is large enough to fully fit all 3 arrays. When pointer chasing first starts, random portions of the array are drawn in as cache lines. However, as the entire array is pulled in, every pointer chase after that is extremely fast. \bigbreak
@@ -157,11 +157,11 @@ We believe L1 Data Cache has a latency of 3 cycles. The average cycles per itera
 
 Our L2 cache size we found to be 64KB, with similar reasoning as L1 cache size. The relatively minor change in cycles per iteration implies very similar overall memory access times between the 16kB and 64kB data points, which can only be achieved if approximately the same percentage of the arrays reside in caches. This would have to be 100\% or close to 100\%. \bigbreak
 
-We found L2 cache latency to be 36 cycles. The array of size 8192 has almost exactly a 5x worse cycles per iteration ($21$ versus $4.2$) than the array of size 4096. We presume that on average for every L1 cache hit in the size 4096 array, there is one cache miss that goes to L2 because the pointer chase is randomly distributed. Then, we can setup a multi-level AMAT equation. We assume the L2 miss rate is negligible on average because once the entire array is pulled in, cache hits will vastly outnumber cache misses. 
+We found L2 cache latency to be 36 cycles. The array of size 8192 has almost exactly a 5x worse cycles per iteration ($21$ versus $4.2$) than the array of size 4096. We presume that on average for every L1 cache hit in the size 4096 array, there is one cache miss that goes to L2 because the pointer chase is randomly distributed. Then, we can setup a multi-level AMAT equation. We assume the L2 miss rate is negligible on average because once the entire array is pulled in, cache hits will vastly outnumber cache misses.
 \begin{gather*}
-        AMAT = L1HT+L1MR(L2HR +L2MR*L2MP) \\
-    21 = 3 + .5(L2HT + 0*L2MP) \\
-    36 = L2HT
+	AMAT = L1HT+L1MR(L2HR +L2MR*L2MP) \\
+	21 = 3 + .5(L2HT + 0*L2MP) \\
+	36 = L2HT
 \end{gather*}
 
 Finally, we found DRAM latency to be 58 cycles. We setup another AMAT to solve for the L2 miss penalty. Similar to solving the L2HT, we found an array that was 8 times larger than what we determined was the L2 cache size. With randomly distributed indices, this should result in an L2 miss rate of 7/8. We plugged this into L2MR variable and solved for L2MP. We were skeptical of this result as it seemed far too low for main memory latency, but were unable to create another test that could measure DRAM latency. \bigbreak
@@ -335,7 +335,7 @@ We found our L1 data cache lines to each be 64 bytes long. We determined this wi
 	}
 \end{lstlisting}
 
-L1 D associativity is LRU, we believe. We ran a program to saturate our data cache cache with an array larger than L1 D\$. Then, we stepped back through the array and measured the time to access elements. We found that the elements closest to the end were all fairly fast accesses. As we approached the middle of our array, we noticed an occasional jump in the cycle count, which is a new chunk of the array being pulled into memory. We know from RocketChip's config that eviction can be only LRU, psuedo-LRU or random, and we deduced it was LRU because out of all possible blocks that could be evicted, it was always the one that we had accessed least recently. 
+L1 D associativity is LRU, we believe. We ran a program to saturate our data cache cache with an array larger than L1 D\$. Then, we stepped back through the array and measured the time to access elements. We found that the elements closest to the end were all fairly fast accesses. As we approached the middle of our array, we noticed an occasional jump in the cycle count, which is a new chunk of the array being pulled into memory. We know from RocketChip's config that eviction can be only LRU, psuedo-LRU or random, and we deduced it was LRU because out of all possible blocks that could be evicted, it was always the one that we had accessed least recently.
 
 \lstset{language=c}
 \begin{lstlisting}
@@ -366,7 +366,7 @@ I learned how to empirically analyze and engineer assembly/C code. I think havin
 
 There is nothing that I would like to change.
 
-Contribution was done individually for each directed part. Then we shared work evenly for open ended, each trying different approaches. I went to OH and found some of the input from other classmates and Josh helpful. 
+Contribution was done individually for each directed part. Then we shared work evenly for open ended, each trying different approaches. I went to OH and found some of the input from other classmates and Josh helpful.
 My partner Kevin Chang contributed mostly to finding more about the data cache, while I contributed by reverse engineering specifications about the instruction cache.
 
 \end{document}
