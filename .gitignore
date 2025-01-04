@@ -6,6 +6,7 @@
 *.pdf
 *.synctex.gz
 *.out
+*.bak*
 
 # BibTeX
 *.bbl
