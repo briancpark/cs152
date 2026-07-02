@@ -1,0 +1,347 @@
+name: Chipyard Labs (1, 2, 3, 5)
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'labs/lab1/**'
+      - 'labs/lab2/**'
+      - 'labs/lab3/**'
+      - 'labs/lab5/**'
+      - '.github/workflows/chipyard-labs.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'labs/lab1/**'
+      - 'labs/lab2/**'
+      - 'labs/lab3/**'
+      - 'labs/lab5/**'
+      - '.github/workflows/chipyard-labs.yml'
+  workflow_dispatch:
+    inputs:
+      lab:
+        description: 'Which lab to build (1, 2, 3, 5, or all)'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - '1'
+          - '2'
+          - '3'
+          - '5'
+          - 'all'
+
+jobs:
+  lab1:
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.lab == '1' || inputs.lab == 'all' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        submodules: false
+
+    - name: Free disk space
+      run: |
+        sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc
+        df -h
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update -qq
+        sudo apt-get install -y -qq verilator openjdk-11-jdk-headless libboost-regex-dev libboost-system-dev device-tree-compiler
+
+    - name: Install RISC-V frontend server
+      run: |
+        cd /tmp
+        git clone --depth 1 https://github.com/riscv-software-src/riscv-isa-sim.git
+        cd riscv-isa-sim && mkdir build && cd build
+        ../configure --prefix=/opt/riscv
+        make -j$(nproc)
+        sudo make install
+
+    - name: Initialize Lab 1 submodules
+      run: |
+        git submodule update --init labs/lab1
+        cd labs/lab1
+        # Use Chipyard init script approach: skip heavy submodules
+        for skip in toolchains/*/riscv-* toolchains/libgloss toolchains/qemu generators/sha3 generators/gemmini sims/firesim vlsi/hammer-* software/firemarshal fpga/fpga-shells; do
+          git config --local "submodule.${skip}.update" none 2>/dev/null || true
+        done
+        git submodule update --init --recursive || true
+        # Unskip
+        for skip in toolchains/*/riscv-* toolchains/libgloss toolchains/qemu generators/sha3 generators/gemmini sims/firesim vlsi/hammer-* software/firemarshal fpga/fpga-shells; do
+          git config --local --unset-all "submodule.${skip}.update" 2>/dev/null || true
+        done
+        # Init sha3, gemmini, firesim non-recursively
+        git submodule update --init generators/sha3 generators/gemmini sims/firesim software/firemarshal || true
+        git config --local submodule.sims/firesim.update none
+        # Init barstools mdf submodule
+        cd tools/barstools && git submodule update --init mdf || true
+
+    - name: Apply build fixes
+      run: |
+        cd labs/lab1
+        # Fix .sbtopts
+        echo "-Dsbt.sourcemode=true" > .sbtopts
+        echo "-Dsbt.workspace=$(pwd)/tools" >> .sbtopts
+        # Comment out treadle test dep in chisel3
+        sed -i 's/libraryDependencies += defaultVersions("treadle") % "test",/\/\/libraryDependencies += defaultVersions("treadle") % "test",/' tools/chisel3/build.sbt 2>/dev/null || true
+        # Fix Verilator flags
+        sed -i 's/VERILATOR := verilator --cc --exe$/VERILATOR := verilator --cc --exe --no-timing/' sims/verilator/Makefile
+        # Fix C++ standard
+        sed -i 's/-std=c++11/-std=c++17/g' sims/common-sim-flags.mk
+        # Remove MaxPermSize (unsupported in Java 11+)
+        sed -i 's/-XX:MaxPermSize=256M//g' variables.mk
+
+    - name: Build Sodor 1-Stage simulator
+      env:
+        JAVA_HOME: /usr/lib/jvm/java-11-openjdk-amd64
+        RISCV: /opt/riscv
+      run: |
+        export PATH=$JAVA_HOME/bin:/opt/riscv/bin:$PATH
+        cd labs/lab1/sims/verilator
+        make CONFIG=Sodor1StageConfig 2>&1 | tail -20
+        # Fix PCH issue if needed
+        BUILD_DIR="generated-src/chipyard.TestHarness.Sodor1StageConfig/chipyard.TestHarness.Sodor1StageConfig"
+        if [ ! -f "$BUILD_DIR/VTestHarness__pch.h.fast" ]; then
+          echo '#include "VTestHarness__pch.h"' > "$BUILD_DIR/VTestHarness__pch.h.fast"
+          echo '#include "VTestHarness__pch.h"' > "$BUILD_DIR/VTestHarness__pch.h.slow"
+          make CONFIG=Sodor1StageConfig 2>&1 | tail -10
+        fi
+
+    - name: Verify simulator
+      run: |
+        ls -lh labs/lab1/sims/verilator/simulator-chipyard-Sodor1StageConfig
+        labs/lab1/sims/verilator/simulator-chipyard-Sodor1StageConfig +help 2>&1 | head -5 || true
+
+  lab2:
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.lab == '2' || inputs.lab == 'all' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        submodules: false
+
+    - name: Free disk space
+      run: |
+        sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc
+        df -h
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update -qq
+        sudo apt-get install -y -qq verilator openjdk-11-jdk-headless libboost-regex-dev libboost-system-dev device-tree-compiler
+
+    - name: Install RISC-V frontend server
+      run: |
+        cd /tmp
+        git clone --depth 1 https://github.com/riscv-software-src/riscv-isa-sim.git
+        cd riscv-isa-sim && mkdir build && cd build
+        ../configure --prefix=/opt/riscv
+        make -j$(nproc)
+        sudo make install
+
+    - name: Initialize Lab 2 submodules
+      run: |
+        git submodule update --init labs/lab2
+        cd labs/lab2
+        for skip in toolchains/*/riscv-* toolchains/libgloss toolchains/qemu generators/sha3 generators/gemmini sims/firesim vlsi/hammer-* software/firemarshal fpga/fpga-shells; do
+          git config --local "submodule.${skip}.update" none 2>/dev/null || true
+        done
+        git submodule update --init --recursive || true
+        for skip in toolchains/*/riscv-* toolchains/libgloss toolchains/qemu generators/sha3 generators/gemmini sims/firesim vlsi/hammer-* software/firemarshal fpga/fpga-shells; do
+          git config --local --unset-all "submodule.${skip}.update" 2>/dev/null || true
+        done
+        git submodule update --init generators/sha3 generators/gemmini sims/firesim software/firemarshal || true
+        git config --local submodule.sims/firesim.update none
+        cd generators/rocket-chip && git config submodule.torture.update none && git submodule update --init || true
+
+    - name: Apply build fixes
+      run: |
+        cd labs/lab2
+        echo "-Dsbt.sourcemode=true" > .sbtopts
+        echo "-Dsbt.workspace=$(pwd)/tools" >> .sbtopts
+        sed -i 's/libraryDependencies += defaultVersions("treadle") % "test",/\/\/libraryDependencies += defaultVersions("treadle") % "test",/' tools/chisel3/build.sbt 2>/dev/null || true
+        sed -i 's/VERILATOR := verilator --cc --exe$/VERILATOR := verilator --cc --exe --no-timing/' sims/verilator/Makefile
+        sed -i 's/-std=c++11/-std=c++17/g' sims/common-sim-flags.mk
+        sed -i 's/-XX:MaxPermSize=256M//g' variables.mk
+
+    - name: Build CS152 Rocket simulator
+      env:
+        JAVA_HOME: /usr/lib/jvm/java-11-openjdk-amd64
+        RISCV: /opt/riscv
+      run: |
+        export PATH=$JAVA_HOME/bin:/opt/riscv/bin:$PATH
+        cd labs/lab2/sims/verilator
+        make CONFIG=CS152RocketConfig 2>&1 | tail -20
+        BUILD_DIR="generated-src/chipyard.TestHarness.CS152RocketConfig/chipyard.TestHarness.CS152RocketConfig"
+        if [ ! -f "$BUILD_DIR/VTestHarness__pch.h.fast" ]; then
+          echo '#include "VTestHarness__pch.h"' > "$BUILD_DIR/VTestHarness__pch.h.fast"
+          echo '#include "VTestHarness__pch.h"' > "$BUILD_DIR/VTestHarness__pch.h.slow"
+          make CONFIG=CS152RocketConfig 2>&1 | tail -10
+        fi
+
+    - name: Verify simulator
+      run: |
+        ls -lh labs/lab2/sims/verilator/simulator-chipyard-CS152RocketConfig
+        labs/lab2/sims/verilator/simulator-chipyard-CS152RocketConfig +help 2>&1 | head -5 || true
+
+  lab3:
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.lab == '3' || inputs.lab == 'all' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        submodules: false
+
+    - name: Free disk space
+      run: |
+        sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc
+        df -h
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update -qq
+        sudo apt-get install -y -qq verilator openjdk-11-jdk-headless libboost-regex-dev libboost-system-dev device-tree-compiler
+
+    - name: Install RISC-V frontend server
+      run: |
+        cd /tmp
+        git clone --depth 1 https://github.com/riscv-software-src/riscv-isa-sim.git
+        cd riscv-isa-sim && mkdir build && cd build
+        ../configure --prefix=/opt/riscv
+        make -j$(nproc)
+        sudo make install
+
+    - name: Initialize Lab 3 submodules
+      run: |
+        git submodule update --init labs/lab3
+        cd labs/lab3
+        for skip in toolchains/*/riscv-* toolchains/libgloss toolchains/qemu generators/sha3 generators/gemmini sims/firesim vlsi/hammer-* software/firemarshal fpga/fpga-shells; do
+          git config --local "submodule.${skip}.update" none 2>/dev/null || true
+        done
+        git submodule update --init --recursive || true
+        for skip in toolchains/*/riscv-* toolchains/libgloss toolchains/qemu generators/sha3 generators/gemmini sims/firesim vlsi/hammer-* software/firemarshal fpga/fpga-shells; do
+          git config --local --unset-all "submodule.${skip}.update" 2>/dev/null || true
+        done
+        git submodule update --init generators/sha3 generators/gemmini sims/firesim software/firemarshal || true
+        git config --local submodule.sims/firesim.update none
+        cd generators/rocket-chip && git config submodule.torture.update none && git submodule update --init || true
+        cd ../../tools/barstools && git submodule update --init mdf || true
+
+    - name: Apply build fixes
+      run: |
+        cd labs/lab3
+        echo "-Dsbt.sourcemode=true" > .sbtopts
+        echo "-Dsbt.workspace=$(pwd)/tools" >> .sbtopts
+        # Fix treadle dep in rocket-chip's chisel3 if applicable
+        find . -path "*/chisel3/build.sbt" -exec sed -i 's/libraryDependencies += defaultVersions("treadle") % "test",/\/\/libraryDependencies += defaultVersions("treadle") % "test",/' {} \; 2>/dev/null || true
+        sed -i 's/VERILATOR := verilator --cc --exe$/VERILATOR := verilator --cc --exe --no-timing/' sims/verilator/Makefile
+        sed -i 's/-std=c++11/-std=c++17/g' sims/common-sim-flags.mk
+        sed -i 's/-XX:MaxPermSize=256M//g' variables.mk
+
+    - name: Build BOOM Baseline simulator
+      env:
+        JAVA_HOME: /usr/lib/jvm/java-11-openjdk-amd64
+        RISCV: /opt/riscv
+      run: |
+        export PATH=$JAVA_HOME/bin:/opt/riscv/bin:$PATH
+        cd labs/lab3/sims/verilator
+        make CONFIG=CS152BaselineBoomConfig 2>&1 | tail -20
+        BUILD_DIR="generated-src/chipyard.TestHarness.CS152BaselineBoomConfig/chipyard.TestHarness.CS152BaselineBoomConfig"
+        if [ ! -f "$BUILD_DIR/VTestHarness__pch.h.fast" ]; then
+          echo '#include "VTestHarness__pch.h"' > "$BUILD_DIR/VTestHarness__pch.h.fast"
+          echo '#include "VTestHarness__pch.h"' > "$BUILD_DIR/VTestHarness__pch.h.slow"
+          make CONFIG=CS152BaselineBoomConfig 2>&1 | tail -10
+        fi
+
+    - name: Verify simulator
+      run: |
+        ls -lh labs/lab3/sims/verilator/simulator-chipyard-CS152BaselineBoomConfig
+        labs/lab3/sims/verilator/simulator-chipyard-CS152BaselineBoomConfig +help 2>&1 | head -5 || true
+
+  lab5:
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.lab == '5' || inputs.lab == 'all' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        submodules: false
+
+    - name: Free disk space
+      run: |
+        sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc
+        df -h
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update -qq
+        sudo apt-get install -y -qq verilator openjdk-11-jdk-headless libboost-regex-dev libboost-system-dev device-tree-compiler
+
+    - name: Install RISC-V frontend server
+      run: |
+        cd /tmp
+        git clone --depth 1 https://github.com/riscv-software-src/riscv-isa-sim.git
+        cd riscv-isa-sim && mkdir build && cd build
+        ../configure --prefix=/opt/riscv
+        make -j$(nproc)
+        sudo make install
+
+    - name: Initialize Lab 5 submodules
+      run: |
+        git submodule update --init labs/lab5
+        cd labs/lab5
+        for skip in toolchains/*/riscv-* toolchains/libgloss toolchains/qemu generators/sha3 generators/gemmini sims/firesim vlsi/hammer-* software/firemarshal fpga/fpga-shells; do
+          git config --local "submodule.${skip}.update" none 2>/dev/null || true
+        done
+        git submodule update --init --recursive || true
+        for skip in toolchains/*/riscv-* toolchains/libgloss toolchains/qemu generators/sha3 generators/gemmini sims/firesim vlsi/hammer-* software/firemarshal fpga/fpga-shells; do
+          git config --local --unset-all "submodule.${skip}.update" 2>/dev/null || true
+        done
+        git submodule update --init sims/firesim || true
+        git config --local submodule.sims/firesim.update none 2>/dev/null || true
+        cd generators/rocket-chip && git config submodule.torture.update none && git submodule update --init || true
+        cd ../../tools/barstools && git submodule update --init mdf 2>/dev/null || true
+
+    - name: Apply build fixes
+      run: |
+        cd labs/lab5
+        # Fix treadle dep in chisel3 if applicable
+        find . -path "*/chisel3/build.sbt" -exec sed -i 's/libraryDependencies += defaultVersions("treadle") % "test",/\/\/libraryDependencies += defaultVersions("treadle") % "test",/' {} \; 2>/dev/null || true
+        sed -i 's/VERILATOR := verilator --cc --exe$/VERILATOR := verilator --cc --exe --no-timing/' sims/verilator/Makefile
+        sed -i 's/-std=c++11/-std=c++17/g' sims/verilator/Makefile variables.mk 2>/dev/null || true
+        sed -i 's/-XX:MaxPermSize=256M//g' variables.mk
+        # Use Java 11 explicitly in SBT command
+        sed -i 's|SBT ?= java |SBT ?= $(JAVA_HOME)/bin/java |' variables.mk 2>/dev/null || true
+
+    - name: Build Dual Rocket MSI simulator
+      env:
+        JAVA_HOME: /usr/lib/jvm/java-11-openjdk-amd64
+        RISCV: /opt/riscv
+      run: |
+        export PATH=$JAVA_HOME/bin:/opt/riscv/bin:$PATH
+        cd labs/lab5/sims/verilator
+        make CONFIG=Lab5MSIDualRocketConfig 2>&1 | tail -20
+        BUILD_DIR="generated-src/chipyard.TestHarness.Lab5MSIDualRocketConfig/chipyard.TestHarness.Lab5MSIDualRocketConfig"
+        if [ ! -f "$BUILD_DIR/VTestHarness__pch.h.fast" ]; then
+          echo '#include "VTestHarness__pch.h"' > "$BUILD_DIR/VTestHarness__pch.h.fast"
+          echo '#include "VTestHarness__pch.h"' > "$BUILD_DIR/VTestHarness__pch.h.slow"
+          make CONFIG=Lab5MSIDualRocketConfig 2>&1 | tail -10
+        fi
+
+    - name: Verify simulator
+      run: |
+        ls -lh labs/lab5/sims/verilator/simulator-chipyard-Lab5MSIDualRocketConfig
+        labs/lab5/sims/verilator/simulator-chipyard-Lab5MSIDualRocketConfig +help 2>&1 | head -5 || true

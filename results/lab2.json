@@ -1,0 +1,42 @@
+{
+  "CS152RocketConfig": {
+    "transpose": {
+      "branches": 21284,
+      "cycles": 614214,
+      "d$ blocked": 351357,
+      "d$ prefetch miss": 0,
+      "d$ regular miss": 8917,
+      "d$ release": 8791,
+      "dtlb miss": 0,
+      "i$ blocked": 250,
+      "i$ miss": 7,
+      "instret": 99994,
+      "itlb miss": 0,
+      "l2 tlb miss": 0,
+      "load-use interlock": 8327,
+      "loads": 16396,
+      "mispredicts": 7239,
+      "stores": 16418
+    }
+  },
+  "CS152RocketL2Config": {
+    "transpose": {
+      "branches": 21284,
+      "cycles": 481353,
+      "d$ blocked": 289757,
+      "d$ prefetch miss": 0,
+      "d$ regular miss": 8918,
+      "d$ release": 6325,
+      "dtlb miss": 0,
+      "i$ blocked": 268,
+      "i$ miss": 7,
+      "instret": 99994,
+      "itlb miss": 0,
+      "l2 tlb miss": 0,
+      "load-use interlock": 5516,
+      "loads": 16396,
+      "mispredicts": 4979,
+      "stores": 16418
+    }
+  }
+}

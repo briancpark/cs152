@@ -1,0 +1,186 @@
+{
+  "Sodor1StageConfig": {
+    "dhrystone": {
+      "arithmetic": 40.381,
+      "branch": 23.757,
+      "bubbles": 0,
+      "cpi": 1.0,
+      "cycles": 245699,
+      "instructions": 245700,
+      "ipc": 1.0,
+      "ldst": 35.321,
+      "misc": 0.541
+    },
+    "median": {
+      "arithmetic": 31.843,
+      "branch": 35.184,
+      "bubbles": 0,
+      "cpi": 1.0,
+      "cycles": 17180,
+      "instructions": 17181,
+      "ipc": 1.0,
+      "ldst": 32.158,
+      "misc": 0.815
+    },
+    "multiply": {
+      "arithmetic": 63.157,
+      "branch": 31.619,
+      "bubbles": 0,
+      "cpi": 1.0,
+      "cycles": 50611,
+      "instructions": 50612,
+      "ipc": 1.0,
+      "ldst": 4.876,
+      "misc": 0.348
+    },
+    "qsort": {
+      "arithmetic": 38.379,
+      "branch": 29.825,
+      "bubbles": 0,
+      "cpi": 1.0,
+      "cycles": 236654,
+      "instructions": 236655,
+      "ipc": 1.0,
+      "ldst": 31.473,
+      "misc": 0.322
+    },
+    "rsort": {
+      "arithmetic": 59.575,
+      "branch": 4.401,
+      "bubbles": 0,
+      "cpi": 1.0,
+      "cycles": 375281,
+      "instructions": 375282,
+      "ipc": 1.0,
+      "ldst": 34.872,
+      "misc": 1.152
+    },
+    "towers": {
+      "arithmetic": 41.716,
+      "branch": 15.389,
+      "bubbles": 0,
+      "cpi": 1.0,
+      "cycles": 19591,
+      "instructions": 19592,
+      "ipc": 1.0,
+      "ldst": 42.18,
+      "misc": 0.715
+    },
+    "vvadd": {
+      "arithmetic": 45.887,
+      "branch": 22.484,
+      "bubbles": 0,
+      "cpi": 1.0,
+      "cycles": 12946,
+      "instructions": 12947,
+      "ipc": 1.0,
+      "ldst": 30.548,
+      "misc": 1.081
+    }
+  },
+  "Sodor2StageConfig": {
+    "towers": {
+      "arithmetic": 42.048,
+      "branch": 15.093,
+      "bubbles": 2323,
+      "cpi": 1.121,
+      "cycles": 21543,
+      "instructions": 19221,
+      "ipc": 0.892,
+      "ldst": 42.131,
+      "misc": 0.728
+    }
+  },
+  "Sodor3StageConfig": {
+    "towers": {
+      "arithmetic": 42.671,
+      "branch": 14.69,
+      "bubbles": 6786,
+      "cpi": 1.362,
+      "cycles": 25533,
+      "instructions": 18748,
+      "ipc": 0.734,
+      "ldst": 41.892,
+      "misc": 0.747
+    }
+  },
+  "Sodor5StageConfig": {
+    "dhrystone": {
+      "arithmetic": 40.53,
+      "branch": 23.725,
+      "bubbles": 78576,
+      "cpi": 1.323,
+      "cycles": 321980,
+      "instructions": 243405,
+      "ipc": 0.756,
+      "ldst": 35.199,
+      "misc": 0.546
+    },
+    "median": {
+      "arithmetic": 32.471,
+      "branch": 35.293,
+      "bubbles": 7745,
+      "cpi": 1.469,
+      "cycles": 24257,
+      "instructions": 16513,
+      "ipc": 0.681,
+      "ldst": 31.387,
+      "misc": 0.848
+    },
+    "multiply": {
+      "arithmetic": 63.801,
+      "branch": 31.62,
+      "bubbles": 28261,
+      "cpi": 1.565,
+      "cycles": 78272,
+      "instructions": 50012,
+      "ipc": 0.639,
+      "ldst": 4.227,
+      "misc": 0.352
+    },
+    "qsort": {
+      "arithmetic": 38.448,
+      "branch": 29.826,
+      "bubbles": 99266,
+      "cpi": 1.421,
+      "cycles": 335271,
+      "instructions": 236006,
+      "ipc": 0.704,
+      "ldst": 31.404,
+      "misc": 0.323
+    },
+    "rsort": {
+      "arithmetic": 59.66,
+      "branch": 4.341,
+      "bubbles": 31081,
+      "cpi": 1.083,
+      "cycles": 405570,
+      "instructions": 374490,
+      "ipc": 0.923,
+      "ldst": 34.844,
+      "misc": 1.155
+    },
+    "towers": {
+      "arithmetic": 42.544,
+      "branch": 14.78,
+      "bubbles": 4728,
+      "cpi": 1.25,
+      "cycles": 23604,
+      "instructions": 18877,
+      "ipc": 0.8,
+      "ldst": 41.935,
+      "misc": 0.742
+    },
+    "vvadd": {
+      "arithmetic": 47.535,
+      "branch": 21.923,
+      "bubbles": 4291,
+      "cpi": 1.351,
+      "cycles": 16519,
+      "instructions": 12229,
+      "ipc": 0.74,
+      "ldst": 29.397,
+      "misc": 1.145
+    }
+  }
+}

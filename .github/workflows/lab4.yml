@@ -1,0 +1,115 @@
+name: Lab 4 - RISC-V Vector Assembly
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'labs/lab4/**'
+      - '.github/workflows/lab4.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'labs/lab4/**'
+      - '.github/workflows/lab4.yml'
+  workflow_dispatch:
+
+jobs:
+  build-and-run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        submodules: false
+
+    - name: Initialize lab4 submodule
+      run: |
+        git submodule update --init labs/lab4
+        cd labs/lab4 && git submodule update --init --recursive
+
+    - name: Install RISC-V toolchain
+      run: |
+        cd /tmp
+        curl -sL "https://github.com/xpack-dev-tools/riscv-none-elf-gcc-xpack/releases/download/v14.2.0-3/xpack-riscv-none-elf-gcc-14.2.0-3-linux-x64.tar.gz" -o riscv-toolchain.tar.gz
+        tar xzf riscv-toolchain.tar.gz
+        sudo mv xpack-riscv-none-elf-gcc-14.2.0-3 /opt/riscv-toolchain
+        # Create symlinks with expected naming
+        cd /opt/riscv-toolchain/bin
+        for f in riscv-none-elf-*; do
+          newname=$(echo "$f" | sed 's/riscv-none-elf/riscv64-unknown-elf/')
+          sudo ln -sf "$(pwd)/$f" "/usr/local/bin/$newname"
+        done
+
+    - name: Install Spike ISA simulator
+      run: |
+        sudo apt-get update -qq
+        sudo apt-get install -y -qq libboost-regex-dev libboost-system-dev device-tree-compiler
+        cd /tmp
+        git clone --depth 1 https://github.com/riscv-software-src/riscv-isa-sim.git
+        cd riscv-isa-sim && mkdir build && cd build
+        ../configure --prefix=/opt/riscv
+        make -j$(nproc)
+        sudo make install
+        echo "/opt/riscv/bin" >> $GITHUB_PATH
+
+    - name: Apply Makefile fixes for newer toolchain
+      working-directory: labs/lab4/benchmarks
+      run: |
+        # Fix march string for newer GCC (zvlsseg merged into v extension)
+        sed -i 's/-Wa,-march=rv64gcv_zvlsseg/-march=rv64gcv_zicsr_zifencei -mabi=lp64d/g' Makefile
+        # Fix Spike flags for newer version (no --varch or --br)
+        sed -i 's/--varch=vlen:512,elen:64,dlen:128 //g' Makefile
+        sed -i 's/--br=3:28:512:6 //g' Makefile
+        # Fix cache flag format for newer Spike
+        sed -i 's/--ic=64:4:64:16/--ic=64:4:64/g' Makefile
+        sed -i 's/--dc=64:4:64:16/--dc=64:4:64/g' Makefile
+        sed -i 's/--l2=1024:8:64:58/--l2=1024:8:64/g' Makefile
+
+    - name: Add malloc stub for bare-metal toolchain
+      working-directory: labs/lab4/benchmarks
+      run: |
+        cat > common/malloc_stub.c << 'STUB'
+        #include <stddef.h>
+        extern char _end[];
+        static char *heap_ptr = 0;
+        void *malloc(size_t size) {
+            if (!heap_ptr) heap_ptr = _end;
+            void *p = heap_ptr;
+            heap_ptr += (size + 7) & ~7;
+            return p;
+        }
+        void free(void *p) { (void)p; }
+        void *calloc(size_t n, size_t size) {
+            size_t total = n * size;
+            char *p = malloc(total);
+            for (size_t i = 0; i < total; i++) p[i] = 0;
+            return p;
+        }
+        void *realloc(void *p, size_t size) { (void)p; return malloc(size); }
+        STUB
+
+    - name: Compile all benchmarks
+      working-directory: labs/lab4/benchmarks
+      run: make
+
+    - name: Run scalar benchmarks on Spike
+      working-directory: labs/lab4/benchmarks
+      run: |
+        export PATH=/opt/riscv/bin:$PATH
+        for bmark in csaxpy cmplxmult dgemv dgemm imax spmv rsort; do
+          echo "=== Running $bmark ==="
+          spike --isa=rv64gcv --ic=64:4:64 --dc=64:4:64 --l2=1024:8:64 ${bmark}.riscv 2>&1 | head -5
+          echo ""
+        done
+
+    - name: Run vector benchmarks on Spike
+      working-directory: labs/lab4/benchmarks
+      run: |
+        export PATH=/opt/riscv/bin:$PATH
+        for bmark in vec-csaxpy vec-cmplxmult vec-dgemv vec-dgemm; do
+          echo "=== Running $bmark ==="
+          spike --isa=rv64gcv --ic=64:4:64 --dc=64:4:64 --l2=1024:8:64 ${bmark}.riscv 2>&1 | head -5
+          echo ""
+        done

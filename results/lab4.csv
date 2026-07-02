@@ -1,0 +1,12 @@
+config,benchmark,mcycle,minstret
+scalar,cmplxmult,160023,160028
+scalar,csaxpy,79935,79940
+scalar,dgemm,154755,154760
+scalar,dgemv,30474,30479
+scalar,imax,80035,80040
+scalar,rsort,222154,222159
+scalar,spmv,97707,97712
+vector,vec-cmplxmult,8770,8775
+vector,vec-csaxpy,4403,4408
+vector,vec-dgemm,34983,34988
+vector,vec-dgemv,3771,3776

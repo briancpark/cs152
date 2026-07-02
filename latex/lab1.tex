@@ -35,50 +35,14 @@ The benchmark that has the highest arithmetic intensity is multiply, which makes
 
 The overall CPI of the machine for each benchmark is as follows:
 
-\begin{table}[ht]
-	\caption{New CPI for Benchmarks} % title of Table
-	\centering % used for centering table
-	\begin{tabular}{c c} % centered columns (4 columns)
-		\hline\hline %inserts double horizontal lines
-		Benchmark & CPI\#1 \\ [0.5ex] % inserts table
-		%heading
-		\hline % inserts single horizontal line
-		dhrystone & 1.475  \\
-		median    & 1.501  \\
-		multiply  & 1.209  \\
-		qsort     & 1.465  \\
-		rsort     & 1.376  \\
-		towers    & 1.502  \\
-		vvadd     & 1.423  \\
-		[1ex] % [1ex] adds vertical space
-		\hline %inserts single line
-	\end{tabular}
-	\label{table:nonlin} % is used to refer this table in the text
-\end{table}
+% auto-generated from results/lab1.json by scripts/gen_lab1_figures.py
+\input{tables/lab1_3_5_1.tex}
 
 \centerline{\includegraphics[width=7in]{figures/3_5_2.png}}
 
 For the case that loads and stores are sped up to have an average CPI of 1, then the new CPIs are as follows:
-\begin{table}[ht]
-	\caption{New CPI for Benchmarks} % title of Table
-	\centering % used for centering table
-	\begin{tabular}{c c} % centered columns (4 columns)
-		\hline\hline %inserts double horizontal lines
-		Benchmark & CPI\#1 \\ [0.5ex] % inserts table
-		%heading
-		\hline % inserts single horizontal line
-		dhrystone & 1.121  \\
-		median    & 1.18   \\
-		multiply  & 1.16   \\
-		qsort     & 1.151  \\
-		rsort     & 1.028  \\
-		towers    & 1.08   \\
-		vvadd     & 1.118  \\
-		[1ex] % [1ex] adds vertical space
-		\hline %inserts single line
-	\end{tabular}
-	\label{table:nonlin} % is used to refer this table in the text
-\end{table}
+% auto-generated from results/lab1.json by scripts/gen_lab1_figures.py
+\input{tables/lab1_3_5_2.tex}
 
 \centerline{\includegraphics[width=7in]{figures/3_5_3.png}}
 

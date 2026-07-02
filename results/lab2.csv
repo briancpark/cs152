@@ -1,0 +1,3 @@
+config,benchmark,cycles,instret,loads,stores,branches,d$ blocked,d$ prefetch miss,d$ regular miss,d$ release,dtlb miss,i$ blocked,i$ miss,itlb miss,l2 tlb miss,load-use interlock,mispredicts
+CS152RocketConfig,transpose,614214,99994,16396,16418,21284,351357,0,8917,8791,0,250,7,0,0,8327,7239
+CS152RocketL2Config,transpose,481353,99994,16396,16418,21284,289757,0,8918,6325,0,268,7,0,0,5516,4979

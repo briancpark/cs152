@@ -1,0 +1,50 @@
+{
+  "scalar": {
+    "cmplxmult": {
+      "mcycle": 160023,
+      "minstret": 160028
+    },
+    "csaxpy": {
+      "mcycle": 79935,
+      "minstret": 79940
+    },
+    "dgemm": {
+      "mcycle": 154755,
+      "minstret": 154760
+    },
+    "dgemv": {
+      "mcycle": 30474,
+      "minstret": 30479
+    },
+    "imax": {
+      "mcycle": 80035,
+      "minstret": 80040
+    },
+    "rsort": {
+      "mcycle": 222154,
+      "minstret": 222159
+    },
+    "spmv": {
+      "mcycle": 97707,
+      "minstret": 97712
+    }
+  },
+  "vector": {
+    "vec-cmplxmult": {
+      "mcycle": 8770,
+      "minstret": 8775
+    },
+    "vec-csaxpy": {
+      "mcycle": 4403,
+      "minstret": 4408
+    },
+    "vec-dgemm": {
+      "mcycle": 34983,
+      "minstret": 34988
+    },
+    "vec-dgemv": {
+      "mcycle": 3771,
+      "minstret": 3776
+    }
+  }
+}
