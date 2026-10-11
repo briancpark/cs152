@@ -1,0 +1,392 @@
+{
+  "CS152BaselineBoomConfig": {
+    "dhrystone": {
+      "branches": 36755,
+      "cpi": 6.64499138045352,
+      "ipc": 0.15048928474783815,
+      "mcycle": 1252747,
+      "minstret": 188525,
+      "mispredict_rate": 0.5906407291524962,
+      "mispredicted": 21709
+    },
+    "median": {
+      "branches": 2433,
+      "cpi": 5.844139115500215,
+      "ipc": 0.17111160091102784,
+      "mcycle": 27222,
+      "minstret": 4658,
+      "mispredict_rate": 0.5577476366625566,
+      "mispredicted": 1357
+    },
+    "multiply": {
+      "branches": 3922,
+      "cpi": 8.227459169214706,
+      "ipc": 0.1215442069578144,
+      "mcycle": 220644,
+      "minstret": 26818,
+      "mispredict_rate": 0.9377868434472209,
+      "mispredicted": 3678
+    },
+    "qsort": {
+      "branches": 37016,
+      "cpi": 5.596475992598124,
+      "ipc": 0.17868387201563912,
+      "mcycle": 689553,
+      "minstret": 123212,
+      "mispredict_rate": 0.49908147827966287,
+      "mispredicted": 18474
+    },
+    "spmv": {
+      "branches": 3816,
+      "cpi": 5.915268907061422,
+      "ipc": 0.16905402200840577,
+      "mcycle": 198197,
+      "minstret": 33506,
+      "mispredict_rate": 0.47929769392033544,
+      "mispredicted": 1829
+    },
+    "towers": {
+      "branches": 559,
+      "cpi": 5.040923076923077,
+      "ipc": 0.19837636574497955,
+      "mcycle": 16383,
+      "minstret": 3250,
+      "mispredict_rate": 0.7799642218246869,
+      "mispredicted": 436
+    },
+    "vvadd": {
+      "branches": 1108,
+      "cpi": 7.1404378356051215,
+      "ipc": 0.14004743448834384,
+      "mcycle": 17287,
+      "minstret": 2421,
+      "mispredict_rate": 0.6895306859205776,
+      "mispredicted": 764
+    }
+  },
+  "CS152BoomBrPredConfig": {
+    "dhrystone": {
+      "branches": 39410,
+      "cpi": 1.0582150908367591,
+      "ipc": 0.9449874686716792,
+      "mcycle": 199500,
+      "minstret": 188525,
+      "mispredict_rate": 0.002410555696523725,
+      "mispredicted": 95
+    },
+    "median": {
+      "branches": 3276,
+      "cpi": 1.8080721339630743,
+      "ipc": 0.553075279031109,
+      "mcycle": 8422,
+      "minstret": 4658,
+      "mispredict_rate": 0.09859584859584859,
+      "mispredicted": 323
+    },
+    "multiply": {
+      "branches": 4739,
+      "cpi": 1.009657692594526,
+      "ipc": 0.9904346862650958,
+      "mcycle": 27077,
+      "minstret": 26818,
+      "mispredict_rate": 0.011394809031441232,
+      "mispredicted": 54
+    },
+    "qsort": {
+      "branches": 37866,
+      "cpi": 2.061170989838652,
+      "ipc": 0.48516110741413054,
+      "mcycle": 253961,
+      "minstret": 123212,
+      "mispredict_rate": 0.27523371890350184,
+      "mispredicted": 10422
+    },
+    "spmv": {
+      "branches": 4620,
+      "cpi": 1.4928072584014804,
+      "ipc": 0.6698788436162981,
+      "mcycle": 50018,
+      "minstret": 33506,
+      "mispredict_rate": 0.14826839826839827,
+      "mispredicted": 685
+    },
+    "towers": {
+      "branches": 1400,
+      "cpi": 1.3403076923076922,
+      "ipc": 0.7460973370064279,
+      "mcycle": 4356,
+      "minstret": 3250,
+      "mispredict_rate": 0.07642857142857143,
+      "mispredicted": 107
+    },
+    "vvadd": {
+      "branches": 1952,
+      "cpi": 1.2197439074762495,
+      "ipc": 0.8198442262106332,
+      "mcycle": 2953,
+      "minstret": 2421,
+      "mispredict_rate": 0.02305327868852459,
+      "mispredicted": 45
+    }
+  },
+  "CS152BoomPRF64Config": {
+    "dhrystone": {
+      "branches": 36748,
+      "cpi": 2.8896485877204614,
+      "ipc": 0.3460628410836847,
+      "mcycle": 544771,
+      "minstret": 188525,
+      "mispredict_rate": 0.590562751714379,
+      "mispredicted": 21702
+    },
+    "median": {
+      "branches": 2432,
+      "cpi": 3.5143838557320737,
+      "ipc": 0.2845448992058644,
+      "mcycle": 16370,
+      "minstret": 4658,
+      "mispredict_rate": 0.5575657894736842,
+      "mispredicted": 1356
+    },
+    "multiply": {
+      "branches": 3910,
+      "cpi": 2.7628458498023716,
+      "ipc": 0.36194563662374823,
+      "mcycle": 74094,
+      "minstret": 26818,
+      "mispredict_rate": 0.9375959079283888,
+      "mispredicted": 3666
+    },
+    "qsort": {
+      "branches": 37015,
+      "cpi": 3.206262377041197,
+      "ipc": 0.311889634223516,
+      "mcycle": 395050,
+      "minstret": 123212,
+      "mispredict_rate": 0.49906794542752936,
+      "mispredicted": 18473
+    },
+    "spmv": {
+      "branches": 3803,
+      "cpi": 2.6787739509341613,
+      "ipc": 0.37330510835050973,
+      "mcycle": 89755,
+      "minstret": 33506,
+      "mispredict_rate": 0.4775177491454115,
+      "mispredicted": 1816
+    },
+    "towers": {
+      "branches": 551,
+      "cpi": 2.1267692307692307,
+      "ipc": 0.47019675925925924,
+      "mcycle": 6912,
+      "minstret": 3250,
+      "mispredict_rate": 0.7767695099818511,
+      "mispredicted": 428
+    },
+    "vvadd": {
+      "branches": 1102,
+      "cpi": 3.013217678645188,
+      "ipc": 0.3318711446196025,
+      "mcycle": 7295,
+      "minstret": 2421,
+      "mispredict_rate": 0.6878402903811253,
+      "mispredicted": 758
+    }
+  },
+  "CS152BoomROB16Config": {
+    "dhrystone": {
+      "branches": 36750,
+      "cpi": 2.3169393979578303,
+      "ipc": 0.43160386537576606,
+      "mcycle": 436801,
+      "minstret": 188525,
+      "mispredict_rate": 0.5905850340136054,
+      "mispredicted": 21704
+    },
+    "median": {
+      "branches": 2432,
+      "cpi": 3.204164877629884,
+      "ipc": 0.3120938023450586,
+      "mcycle": 14925,
+      "minstret": 4658,
+      "mispredict_rate": 0.5575657894736842,
+      "mispredicted": 1356
+    },
+    "multiply": {
+      "branches": 3909,
+      "cpi": 2.234543963009919,
+      "ipc": 0.44751860628108,
+      "mcycle": 59926,
+      "minstret": 26818,
+      "mispredict_rate": 0.9375799437196214,
+      "mispredicted": 3665
+    },
+    "qsort": {
+      "branches": 37018,
+      "cpi": 2.79279615621855,
+      "ipc": 0.35806408490407027,
+      "mcycle": 344106,
+      "minstret": 123212,
+      "mispredict_rate": 0.4991085417904803,
+      "mispredicted": 18476
+    },
+    "spmv": {
+      "branches": 3803,
+      "cpi": 1.6175311884438608,
+      "ipc": 0.6182261010757053,
+      "mcycle": 54197,
+      "minstret": 33506,
+      "mispredict_rate": 0.4775177491454115,
+      "mispredicted": 1816
+    },
+    "towers": {
+      "branches": 554,
+      "cpi": 1.4495384615384614,
+      "ipc": 0.689874761197198,
+      "mcycle": 4711,
+      "minstret": 3250,
+      "mispredict_rate": 0.7779783393501805,
+      "mispredicted": 431
+    },
+    "vvadd": {
+      "branches": 1105,
+      "cpi": 2.2965716646014043,
+      "ipc": 0.435431654676259,
+      "mcycle": 5560,
+      "minstret": 2421,
+      "mispredict_rate": 0.6886877828054299,
+      "mispredicted": 761
+    }
+  },
+  "CS152SWPredBoomConfig": {
+    "dhrystone": {
+      "branches": 39398,
+      "cpi": 0.8966927463201166,
+      "ipc": 1.1152091996994955,
+      "mcycle": 169049,
+      "minstret": 188525,
+      "mispredict_rate": 0.0316005888623788,
+      "mispredicted": 1245
+    },
+    "median": {
+      "branches": 3277,
+      "cpi": 2.170674109059682,
+      "ipc": 0.46068638116902383,
+      "mcycle": 10111,
+      "minstret": 4658,
+      "mispredict_rate": 0.17485505035093074,
+      "mispredicted": 573
+    },
+    "multiply": {
+      "branches": 4702,
+      "cpi": 0.5681631739876203,
+      "ipc": 1.7600577541510796,
+      "mcycle": 15237,
+      "minstret": 26818,
+      "mispredict_rate": 0.04125903870693322,
+      "mispredicted": 194
+    },
+    "qsort": {
+      "branches": 37850,
+      "cpi": 1.8842645196896406,
+      "ipc": 0.530711049085991,
+      "mcycle": 232164,
+      "minstret": 123212,
+      "mispredict_rate": 0.2636459709379128,
+      "mispredicted": 9979
+    },
+    "spmv": {
+      "branches": 4594,
+      "cpi": 1.0803438190174894,
+      "ipc": 0.9256312503453229,
+      "mcycle": 36198,
+      "minstret": 33506,
+      "mispredict_rate": 0.19024814976055726,
+      "mispredicted": 874
+    },
+    "towers": {
+      "branches": 1379,
+      "cpi": 1.1356923076923078,
+      "ipc": 0.8805201842319155,
+      "mcycle": 3691,
+      "minstret": 3250,
+      "mispredict_rate": 0.11747643219724438,
+      "mispredicted": 162
+    },
+    "vvadd": {
+      "branches": 1943,
+      "cpi": 0.8166047087980174,
+      "ipc": 1.2245827010622155,
+      "mcycle": 1977,
+      "minstret": 2421,
+      "mispredict_rate": 0.04734945959855893,
+      "mispredicted": 92
+    }
+  },
+  "CS152SWPredBoomConfig_custom": {
+    "dhrystone": {
+      "branches": 38521,
+      "cpi": 1.1379180480042435,
+      "ipc": 0.87879790794589,
+      "mcycle": 214526,
+      "minstret": 188525,
+      "mispredict_rate": 0.14586848731860544,
+      "mispredicted": 5619
+    },
+    "median": {
+      "branches": 3257,
+      "cpi": 2.64405324173465,
+      "ipc": 0.3782072101331601,
+      "mcycle": 12316,
+      "minstret": 4658,
+      "mispredict_rate": 0.3536997236720909,
+      "mispredicted": 1152
+    },
+    "multiply": {
+      "branches": 4713,
+      "cpi": 1.643858602431203,
+      "ipc": 0.6083248270386753,
+      "mcycle": 44085,
+      "minstret": 26818,
+      "mispredict_rate": 0.6772756206238065,
+      "mispredicted": 3192
+    },
+    "qsort": {
+      "branches": 37863,
+      "cpi": 2.2021637502840634,
+      "ipc": 0.45409883795926037,
+      "mcycle": 271333,
+      "minstret": 123212,
+      "mispredict_rate": 0.3866571587037477,
+      "mispredicted": 14640
+    },
+    "spmv": {
+      "branches": 4596,
+      "cpi": 1.1591356771921446,
+      "ipc": 0.8627117771254956,
+      "mcycle": 38838,
+      "minstret": 33506,
+      "mispredict_rate": 0.3387728459530026,
+      "mispredicted": 1557
+    },
+    "towers": {
+      "branches": 551,
+      "cpi": 1.1187692307692307,
+      "ipc": 0.8938393839383938,
+      "mcycle": 3636,
+      "minstret": 3250,
+      "mispredict_rate": 0.6261343012704175,
+      "mispredicted": 345
+    },
+    "vvadd": {
+      "branches": 1102,
+      "cpi": 1.7744733581164809,
+      "ipc": 0.5635474860335196,
+      "mcycle": 4296,
+      "minstret": 2421,
+      "mispredict_rate": 0.6515426497277677,
+      "mispredicted": 718
+    }
+  }
+}

@@ -11,3 +11,7 @@
 # BibTeX
 *.bbl
 *.blg
+
+# run_labs.sh build products (libgloss, test binaries)
+build/
+__pycache__/

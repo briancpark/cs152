@@ -1,0 +1,80 @@
+{
+  "Lab5MESIDualRocketConfig": {
+    "mt-matmul-naive": {
+      "cpi": 3.9,
+      "cycles": 470117,
+      "cycles_per_iter": 14.3,
+      "func": "matmul_naive"
+    },
+    "mt-matmul-opt": {
+      "cpi": 2.4,
+      "cycles": 166102,
+      "cycles_per_iter": 5.0,
+      "func": "matmul_opt"
+    },
+    "mt-vvadd-naive": {
+      "cpi": 7.7,
+      "cycles": 39004,
+      "cycles_per_iter": 39.0,
+      "func": "vvadd_naive"
+    },
+    "mt-vvadd-opt": {
+      "cpi": 5.5,
+      "cycles": 22329,
+      "cycles_per_iter": 22.3,
+      "func": "vvadd_opt"
+    }
+  },
+  "Lab5MIDualRocketConfig": {
+    "mt-matmul-naive": {
+      "cpi": 16.7,
+      "cycles": 2015904,
+      "cycles_per_iter": 61.5,
+      "func": "matmul_naive"
+    },
+    "mt-matmul-opt": {
+      "cpi": 3.6,
+      "cycles": 252417,
+      "cycles_per_iter": 7.7,
+      "func": "matmul_opt"
+    },
+    "mt-vvadd-naive": {
+      "cpi": 10.7,
+      "cycles": 54035,
+      "cycles_per_iter": 54.0,
+      "func": "vvadd_naive"
+    },
+    "mt-vvadd-opt": {
+      "cpi": 6.8,
+      "cycles": 27599,
+      "cycles_per_iter": 27.5,
+      "func": "vvadd_opt"
+    }
+  },
+  "Lab5MSIDualRocketConfig": {
+    "mt-matmul-naive": {
+      "cpi": 4.4,
+      "cycles": 530310,
+      "cycles_per_iter": 16.1,
+      "func": "matmul_naive"
+    },
+    "mt-matmul-opt": {
+      "cpi": 2.6,
+      "cycles": 179804,
+      "cycles_per_iter": 5.4,
+      "func": "matmul_opt"
+    },
+    "mt-vvadd-naive": {
+      "cpi": 9.7,
+      "cycles": 48979,
+      "cycles_per_iter": 48.9,
+      "func": "vvadd_naive"
+    },
+    "mt-vvadd-opt": {
+      "cpi": 6.7,
+      "cycles": 27235,
+      "cycles_per_iter": 27.2,
+      "func": "vvadd_opt"
+    }
+  }
+}
