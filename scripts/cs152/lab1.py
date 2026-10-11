@@ -93,9 +93,12 @@ def trace_stats(path, isa):
 
 
 def collect():
+    outputs = sim_outputs("lab1")
+    if not outputs:                 # e.g. a fresh clone without the submodule
+        return {}
     isa = _sodor_isa()
     data = {}
-    for cfg, d in sim_outputs("lab1").items():
+    for cfg, d in outputs.items():
         if "Sodor" not in cfg:
             continue
         for log in sorted(d.glob("*.log")):
